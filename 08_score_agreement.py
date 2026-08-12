@@ -50,25 +50,73 @@ def interpret(k: float) -> str:
     return "almost perfect"
 
 
+def norm_text(s: pd.Series) -> pd.Series:
+    return (
+        s.astype(str)
+        .str.replace(r"^\s*\[[^\]]+\]\s*", "", regex=True)   # old [Entity] prefix
+        .str.lower()
+        .str.replace(r"\s+", " ", regex=True)
+        .str.strip()
+    )
+
+
 def load(path: str) -> pd.DataFrame:
     df = pd.read_csv(path)
     for col in ("text", "label"):
         if col not in df.columns:
             raise SystemExit(f"{path}: missing '{col}' column. Found {list(df.columns)}")
-    key = "id" if "id" in df.columns else ("row" if "row" in df.columns else None)
-    if key is None:
-        raise SystemExit(f"{path}: needs an 'id' or 'row' column to align annotators.")
     out = pd.DataFrame(
         {
-            "key": df[key],
             "text": df["text"].astype(str),
             "raw": df["label"].fillna("").astype(str),
         }
     )
+    out["text_key"] = norm_text(df["text"])
+    id_col = "id" if "id" in df.columns else ("row" if "row" in df.columns else None)
+    out["id_key"] = df[id_col] if id_col else None
     out["labels"] = out["raw"].apply(lambda v: frozenset(p for p in v.split("#") if p))
     # primary = first label as Doccano wrote it; blank stays blank
     out["primary"] = out["raw"].apply(lambda v: v.split("#")[0] if v else "")
-    return out.set_index("key")
+    return out
+
+
+def choose_key(frames: dict, names: list, push) -> str:
+    """Pick 'id_key' or 'text_key' - whichever actually aligns these files.
+
+    Doccano assigns its own ids per project, so two people importing the same
+    tweets from a CSV WITHOUT an id column end up with different id ranges.
+    In that case the tweet text is the only reliable join key.
+    """
+    have_ids = all(frames[n]["id_key"].notna().all() for n in names)
+    if have_ids:
+        shared = set.intersection(*(set(frames[n]["id_key"]) for n in names))
+        if shared:
+            ok = True
+            ref = frames[names[0]].set_index("id_key").loc[sorted(shared), "text_key"]
+            for n in names[1:]:
+                other = frames[n].set_index("id_key").loc[sorted(shared), "text_key"]
+                if (ref.to_numpy() != other.to_numpy()).any():
+                    ok = False
+                    break
+            if ok:
+                push(f"    join key : 'id' ({len(shared)} shared ids, text verified consistent)")
+                return "id_key"
+            push("    note: ids exist but point at DIFFERENT tweets in different files,")
+            push("          which happens when each person imported a CSV that had no id")
+            push("          column and Doccano numbered the rows itself.")
+        else:
+            push("    note: no ids are shared between the files.")
+
+    dupes = {n: frames[n]["text_key"].duplicated().sum() for n in names}
+    if any(dupes.values()):
+        raise SystemExit(
+            "Cannot align these files.\n"
+            "  Ids do not match, and the tweet text cannot be used instead because "
+            f"some texts repeat: {dupes}\n"
+            "  Re-export from projects built off a CSV that carries an id column."
+        )
+    push("    join key : tweet TEXT (ids disagree, but every text is unique so this is safe)")
+    return "text_key"
 
 
 def main() -> None:
@@ -96,8 +144,12 @@ def main() -> None:
 
     # ------------------------------------------------------------- align
     push("\n[1] ALIGNMENT CHECK")
+    key = choose_key(frames, names, push)
+    for n in names:
+        frames[n] = frames[n].set_index(key)
+
     common = set.intersection(*(set(frames[n].index) for n in names))
-    push(f"    document ids present in every file : {len(common)}")
+    push(f"    documents present in every file : {len(common)}")
     for n in names:
         missing = len(frames[n]) - len(common)
         if missing:

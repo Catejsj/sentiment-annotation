@@ -1,0 +1,99 @@
+==============================================================================
+INTER-ANNOTATOR AGREEMENT  -  2 annotators
+Cohen's Kappa (scikit-learn) + Fleiss' Kappa (statsmodels)
+==============================================================================
+
+files:
+    seth                 exports/seth_annotations.csv   (100 rows)
+    teammate53           /tmp/claude-1000/-home-sherlock-Desktop-sentiment-annotation/1c41e727-2178-4547-9d50-f2ec20c95dfe/scratchpad/fake/teammate53.csv   (53 rows)
+
+[1] ALIGNMENT CHECK
+    note: ids exist but point at DIFFERENT tweets in different files,
+          which happens when each person imported a CSV that had no id
+          column and Doccano numbered the rows itself.
+    join key : tweet TEXT (ids disagree, but every text is unique so this is safe)
+    documents present in every file : 53
+    [!] seth has 47 rows that the others do not
+    ok  every shared id carries identical text in every file
+
+
+[2] LABEL DISTRIBUTION (primary label)
+            seth  teammate53
+Positive      18          10
+Negative      15          14
+Neutral        8          13
+Irrelevant    12          16
+
+
+[3] PAIRWISE COHEN'S KAPPA  (primary label)
+             seth  teammate53
+seth        1.000       0.051
+teammate53  0.051       1.000
+
+    pair-by-pair, with raw agreement for context:
+      seth           vs teammate53     kappa= 0.051  raw=28.3%  slight
+
+    mean pairwise kappa : 0.051  (slight)
+
+
+[4] FLEISS' KAPPA
+    Needs 3+ annotators; with 2 files Cohen's Kappa above is the right measure.
+
+
+[5] MULTI-LABEL VIEWS  (because we allow two labels per tweet)
+    exact-match agreement - both annotators picked the identical label SET:
+      seth           vs teammate53      24.5%
+
+    per-label Cohen's kappa - 'did we both apply this label?'
+      label            mean kappa   interpretation
+      Positive              0.054   slight
+      Negative             -0.021   poor (worse than chance)
+      Neutral               0.060   slight
+      Irrelevant            0.036   slight
+
+
+[6] WHERE WE DISAGREE
+    unanimous            :  15 / 53 tweets
+    majority but not all :   0
+    no majority          :  38
+
+    10 most contested tweets:
+      id=4 favorite game soundtracks:.. doom. doom. doom. doom forever  [1/2 agree]
+        4 Favorite Game Soundtracks:.. Doom. Doom. Doom. Doom forever
+        seth=Positive, teammate53=Irrelevant
+      id=4 favorite games of all time. (thanks @317slayer and @drunk_cookies!). . 1. halo 2/3 can't pick. 2. rocket league. 3. kingdom hearts 2. 4. super mario bros all stars (this was probably the first game i ever played). . @demintele_sway @discospider93 @void_bwungus @lstesports let’s see em!  [1/2 agree]
+        4 favorite games of all time. (thanks @317Slayer and @Drunk_Cookies!). . 1. Halo 2/3 can't pick.
+        seth=Positive, teammate53=Negative
+      id=@ yoyaltygaming i can't see them.  [1/2 agree]
+        @ YoyaltyGaming I can't see them.
+        seth=Irrelevant, teammate53=Neutral
+      id=@argoshelpers i do love how you took money from providing my paypal for ps5 but because the order didn ’ t completely go through your high end management because they ran an out worth of stock the moment i paid?.  [1/2 agree]
+        @ArgosHelpers I do love how you took money from providing my PayPal for PS5 but because the orde
+        seth=Negative, teammate53=Neutral
+      id=all hyped for cold war, campaign is something i cant wait let start! who else is hyped!?  [1/2 agree]
+        all hyped for cold war, campaign is something i cant wait let start! Who else is hyped!?
+        seth=Positive, teammate53=Irrelevant
+      id=and exclusive to playstation? oh fuck off. pic.twitter.com/1nwftyvxex  [1/2 agree]
+        and Exclusive to PlayStation? Oh fuck off. pic.twitter.com/1NwFtyVXeX
+        seth=Negative, teammate53=Neutral
+      id=attacked again ibm, amd releases rx 6000 dual accelerator cards: lower reviews tnewspro.com/2020/10/29/att...  [1/2 agree]
+        Attacked again IBM, AMD releases RX 6000 dual accelerator cards: lower reviews tnewspro.com/2020
+        seth=Irrelevant, teammate53=Negative
+      id=beautiful song. powerful lyrics that more people should hear.. "furious love" by veridia on amazon music. music.amazon.com/albums/b00ipby…  [1/2 agree]
+        Beautiful song. Powerful lyrics that more people should hear..  "Furious Love" by VERIDIA on Ama
+        seth=Positive, teammate53=Negative
+      id=best pistol player in 2016:go?..  [1/2 agree]
+        Best pistol player in 2016:GO?..
+        seth=Irrelevant, teammate53=Negative
+      id=congratulations guys finally pubg unban ho gye thnks @zakawaqar thnks all pubg lover .  [1/2 agree]
+        Congratulations guys finally PUBG UNBAN ho gye thnks @ZakaWaqar  thnks all pubg lover .
+        seth=Positive, teammate53=Irrelevant
+
+
+[7] READING THESE NUMBERS
+    Cohen's Kappa is agreement AFTER removing the agreement you would
+    expect from two people guessing with the same label frequencies.
+    That is why it is always lower than the raw percentage, and why it
+    is the honest figure to quote.
+      < 0.20 slight | 0.21-0.40 fair | 0.41-0.60 moderate
+      0.61-0.80 substantial | > 0.80 almost perfect   (Landis & Koch 1977)
