@@ -40,10 +40,10 @@ from textattack.transformations import (
     WordInsertionRandomSynonym,
 )
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(HERE, "data")
-REPORT_DIR = os.path.join(HERE, "reports")
-EXPORT_DIR = os.path.join(HERE, "exports")
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA_DIR = os.path.join(ROOT, "data", "augmented")
+REPORT_DIR = os.path.join(ROOT, "reports")
+EXPORT_DIR = os.path.join(ROOT, "data", "raw")
 
 
 def default_csv() -> str:
@@ -51,7 +51,7 @@ def default_csv() -> str:
     found = sorted(f for f in os.listdir(EXPORT_DIR) if f.endswith(".csv")) if os.path.isdir(EXPORT_DIR) else []
     if len(found) == 1:
         return os.path.join(EXPORT_DIR, found[0])
-    return os.path.join(EXPORT_DIR, "my_annotations.csv")
+    return os.path.join(EXPORT_DIR, "annotated_tweets.csv")
 
 SEED = 42
 # Words whose loss would invert the sentiment of the tweet.
@@ -129,7 +129,7 @@ def main() -> None:
     ap.add_argument("--csv", default=default_csv())
     ap.add_argument("--variants", type=int, default=2, help="variants per technique per tweet")
     ap.add_argument("--pct", type=float, default=0.15, help="fraction of words each op touches")
-    ap.add_argument("--out", default=os.path.join(DATA_DIR, "augmented_corpus.csv"))
+    ap.add_argument("--out", default=os.path.join(DATA_DIR, "tweets_augmented.csv"))
     args = ap.parse_args()
 
     random.seed(SEED)
@@ -246,7 +246,7 @@ def main() -> None:
 
     push("\n[6] NEXT STEP")
     push("    Run the preprocessing pipeline on THIS file, not on the raw export:")
-    push(f"        python 03_preprocessing.py --csv {args.out} --tag augmented")
+    push(f"        python scripts/preprocess.py --csv {args.out} --tag augmented")
 
     report = "\n".join(lines)
     path = os.path.join(REPORT_DIR, "augmentation_report.txt")

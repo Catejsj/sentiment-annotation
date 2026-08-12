@@ -21,14 +21,14 @@ which degrades the synonym lookups.
 
 | Script | Purpose |
 |---|---|
-| `01_export_from_doccano.py` | Pull annotations out of Doccano via its REST API |
+| `scripts/doccano_export.py` | Pull annotations out of Doccano via its REST API |
 | `02_agreement_analysis.py` | Cohen's + Fleiss' kappa over the original 8-pass corpus |
-| `03_preprocessing.py` | 14-stage cleaning pipeline (`--csv`, `--tag`) |
+| `scripts/preprocess.py` | 14-stage cleaning pipeline (`--csv`, `--tag`) |
 | `04_compare_with_classmate.py` | Two-annotator comparison with alignment checks |
-| `05_setup_doccano_project.py` | Build a reproducible Doccano project from a CSV |
-| `06_validate_and_compare.py` | Validate an export, compare two annotators |
-| `07_augment.py` | **Data augmentation** — TextAttack swap / insert / delete |
-| `08_score_agreement.py` | **Scoring** — Cohen's + Fleiss' kappa for N annotators |
+| `scripts/doccano_setup.py` | Build a reproducible Doccano project from a CSV |
+| `scripts/validate.py` | Validate an export, compare two annotators |
+| `scripts/augment.py` | **Data augmentation** — TextAttack swap / insert / delete |
+| `scripts/score.py` | **Scoring** — Cohen's + Fleiss' kappa for N annotators |
 
 ## Setup
 
@@ -43,15 +43,15 @@ python3 -m venv .venv && ./.venv/bin/pip install -r requirements.txt
 ## Usage
 
 ```bash
-./.venv/bin/python 07_augment.py
+./.venv/bin/python scripts/augment.py
 ```
 
 ```bash
-./.venv/bin/python 03_preprocessing.py --csv data/augmented_corpus.csv --tag augmented
+./.venv/bin/python scripts/preprocess.py --csv data/augmented_corpus.csv --tag augmented
 ```
 
 ```bash
-./.venv/bin/python 08_score_agreement.py exports/*.csv
+./.venv/bin/python scripts/score.py exports/*.csv
 ```
 
 ## Augmentation
@@ -80,7 +80,7 @@ Label balance is preserved to within 0.4 percentage points across all classes.
 
 ## Scoring
 
-`08_score_agreement.py` takes any number of Doccano exports and reports:
+`scripts/score.py` takes any number of Doccano exports and reports:
 
 - pairwise **Cohen's kappa** (scikit-learn) for every pair
 - **Fleiss' kappa** (statsmodels) across all annotators at once
@@ -104,7 +104,7 @@ the entity** named in each row.
 Two labels may be combined where a tweet genuinely sits in both places
 (`Irrelevant+Positive`, `Neutral+Positive`). `Positive+Negative` is forbidden —
 a tweet cannot be both favourable and hostile towards the same entity.
-`06_validate_and_compare.py` enforces this on every export.
+`scripts/validate.py` enforces this on every export.
 
 See `SHARED_SETUP.md` for the full protocol used to keep multiple annotators'
 projects identical.

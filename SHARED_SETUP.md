@@ -26,10 +26,10 @@ Doccano must be running:
 docker start doccano
 ```
 
-Then, with `05_setup_doccano_project.py` and the CSV in place:
+Then, with `scripts/doccano_setup.py` and the CSV in place:
 
 ```bash
-python 05_setup_doccano_project.py --csv annotated_tweets_50.csv
+python scripts/doccano_setup.py --csv annotated_tweets_50.csv
 ```
 
 That script pins every setting that could otherwise drift:
@@ -72,7 +72,7 @@ Rename it so you know whose it is, e.g. `sherlock.csv` and `friend.csv`.
 Check your own file before sending it:
 
 ```bash
-python 06_validate_and_compare.py sherlock.csv
+python scripts/validate.py sherlock.csv
 ```
 
 It tells you if you left anything unannotated or broke the Positive+Negative rule.
@@ -81,7 +81,7 @@ Fix those in Doccano and re-export.
 Then compare the two:
 
 ```bash
-python 06_validate_and_compare.py sherlock.csv friend.csv
+python scripts/validate.py sherlock.csv friend.csv
 ```
 
 You get exact-match agreement, per-label Cohen's kappa, and the list of tweets

@@ -32,7 +32,7 @@ from sklearn.metrics import cohen_kappa_score
 from statsmodels.stats.inter_rater import aggregate_raters, fleiss_kappa
 
 LABELS = ["Positive", "Negative", "Neutral", "Irrelevant"]
-REPORT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "reports")
+REPORT_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "reports")
 
 
 def interpret(k: float) -> str:

@@ -1,163 +1,169 @@
 ==============================================================================
-TEXT PREPROCESSING REPORT  -  Twitter sentiment corpus (100 annotated tweets)
-source: /home/sherlock/Desktop/sentiment_annotation/data/doccano_export.csv (exported from Doccano)
-entities covered: 1
+PREPROCESSING REPORT  -  100 documents
+source: /home/sherlock/Desktop/sentiment_annotation/data/raw/annotated_tweets.csv
+entities covered: 28
 ==============================================================================
 
-[1] PIPELINE - the order matters
+[1] PIPELINE
 
-    raw tweet
-      01 strip the [Entity] tag Doccano adds
-      02 unescape HTML entities        (&amp;  -> &)
-      03 remove URLs
-      04 remove @mentions
-      05 unwrap #hashtags              (#BoT   -> BoT)
-      06 lowercase
-      07 EXPAND CONTRACTIONS           (don't  -> do not)      <-- required
-      08 squash elongations            (soooo  -> soo)
-      09 remove emoji / digits / punctuation
-      10 normalise whitespace
-      11 WORD TOKENIZATION             (nltk TweetTokenizer)   <-- required
-      12 STOPWORDS REMOVAL             (nltk, negations kept)  <-- required
-      13 LEMMATIZATION                 (WordNet + POS tags)    <-- required
-      14 drop 1-character tokens
+      01 strip [Entity] tag        08 squash elongations (soooo -> soo)
+      02 unescape HTML             09 remove emoji / punctuation
+      03 remove URLs               10 normalise whitespace
+      04 remove @mentions          11 WORD TOKENIZATION      <-- required
+      05 unwrap #hashtags          12 drop pure-numeric tokens
+      06 lowercase                 13 STOPWORD REMOVAL       <-- required
+      07 EXPAND CONTRACTIONS <--   14 LEMMATIZATION          <-- required
+         required                  15 drop 1-character tokens
 
-    Two ordering decisions worth defending in the write-up:
-      * contraction expansion (07) MUST come before punctuation removal (09).
+    Ordering decisions worth defending:
+      * contraction expansion (07) MUST precede punctuation removal (09).
         Reverse them and "don't" becomes "dont", which no expander recognises.
-      * lemmatization (13) comes after stopword removal (12) so we lemmatize
-        fewer tokens, and after lowercasing so WordNet lookups actually hit.
+      * lemmatization (14) runs after stopword removal (13), so fewer tokens
+        need tagging, and after lowercasing so WordNet lookups hit.
 
-[2] STAGE-BY-STAGE ON REAL TWEETS  (this is the 'cleaned text' view)
-
-------------------------------------------------------------------------------
-tweet id=7   entity=Borderlands   label=Positive
-------------------------------------------------------------------------------
-  00_raw                   | "[Borderlands] So I spent a few hours making something for fun. . . If you don't know I am a HUGE @Borderlands fan and Maya is one of my favorite characters. So I decided to make myself a wallpaper for my PC. . Here is the original image versus the creation I made :) Enjoy! pic.twitter.com/mLsI5wf9Jg"
-  01_strip_entity_tag      | "So I spent a few hours making something for fun. . . If you don't know I am a HUGE @Borderlands fan and Maya is one of my favorite characters. So I decided to make myself a wallpaper for my PC. . Here is the original image versus the creation I made :) Enjoy! pic.twitter.com/mLsI5wf9Jg"
-  02_unescape_html         | "So I spent a few hours making something for fun. . . If you don't know I am a HUGE @Borderlands fan and Maya is one of my favorite characters. So I decided to make myself a wallpaper for my PC. . Here is the original image versus the creation I made :) Enjoy! pic.twitter.com/mLsI5wf9Jg"
-  03_remove_urls           | "So I spent a few hours making something for fun. . . If you don't know I am a HUGE @Borderlands fan and Maya is one of my favorite characters. So I decided to make myself a wallpaper for my PC. . Here is the original image versus the creation I made :) Enjoy!  "
-  04_remove_mentions       | "So I spent a few hours making something for fun. . . If you don't know I am a HUGE   fan and Maya is one of my favorite characters. So I decided to make myself a wallpaper for my PC. . Here is the original image versus the creation I made :) Enjoy!  "
-  05_unwrap_hashtags       | "So I spent a few hours making something for fun. . . If you don't know I am a HUGE   fan and Maya is one of my favorite characters. So I decided to make myself a wallpaper for my PC. . Here is the original image versus the creation I made :) Enjoy!  "
-  06_lowercase             | "so i spent a few hours making something for fun. . . if you don't know i am a huge   fan and maya is one of my favorite characters. so i decided to make myself a wallpaper for my pc. . here is the original image versus the creation i made :) enjoy!  "
-  07_expand_contractions   | 'so i spent a few hours making something for fun. . . if you do not know i am a huge   fan and maya is one of my favorite characters. so i decided to make myself a wallpaper for my pc. . here is the original image versus the creation i made :) enjoy!  '
-  08_squash_elongation     | 'so i spent a few hours making something for fun. . . if you do not know i am a huge  fan and maya is one of my favorite characters. so i decided to make myself a wallpaper for my pc. . here is the original image versus the creation i made :) enjoy!  '
-  09_strip_non_letters     | 'so i spent a few hours making something for fun      if you do not know i am a huge  fan and maya is one of my favorite characters  so i decided to make myself a wallpaper for my pc    here is the original image versus the creation i made    enjoy   '
-  10_normalise_space       | 'so i spent a few hours making something for fun if you do not know i am a huge fan and maya is one of my favorite characters so i decided to make myself a wallpaper for my pc here is the original image versus the creation i made enjoy'
-  11_tokenized             | ['so', 'i', 'spent', 'a', 'few', 'hours', 'making', 'something', 'for', 'fun', 'if', 'you', 'do', 'not', 'know', 'i', 'am', 'a', 'huge', 'fan', 'and', 'maya', 'is', 'one', 'of', 'my', 'favorite', 'characters', 'so', 'i', 'decided', 'to', 'make', 'myself', 'a', 'wallpaper', 'for', 'my', 'pc', 'here', 'is', 'the', 'original', 'image', 'versus', 'the', 'creation', 'i', 'made', 'enjoy']
-  12_stopwords_removed     | ['spent', 'hours', 'making', 'something', 'fun', 'not', 'know', 'huge', 'fan', 'maya', 'one', 'favorite', 'characters', 'decided', 'make', 'wallpaper', 'pc', 'original', 'image', 'versus', 'creation', 'made', 'enjoy']
-  13_lemmatized            | ['spent', 'hour', 'make', 'something', 'fun', 'not', 'know', 'huge', 'fan', 'maya', 'one', 'favorite', 'character', 'decide', 'make', 'wallpaper', 'pc', 'original', 'image', 'versus', 'creation', 'make', 'enjoy']
-  14_short_dropped         | ['spent', 'hour', 'make', 'something', 'fun', 'not', 'know', 'huge', 'fan', 'maya', 'one', 'favorite', 'character', 'decide', 'make', 'wallpaper', 'pc', 'original', 'image', 'versus', 'creation', 'make', 'enjoy']
-  >> CLEANED TEXT          | 'spent hour make something fun not know huge fan maya one favorite character decide make wallpaper pc original image versus creation make enjoy'
+[2] STAGE-BY-STAGE ON REAL TWEETS  (the 'cleaned text' view)
 
 ------------------------------------------------------------------------------
-tweet id=8   entity=Borderlands   label=Positive
+id=8   entity=CallOfDutyBlackopsColdWar   label=Positive
 ------------------------------------------------------------------------------
-  00_raw                   | "[Borderlands] So I spent a couple of hours doing something for fun... If you don't know that I'm a huge @ Borderlands fan and Maya is one of my favorite characters, I decided to make a wallpaper for my PC.. Here's the original picture compared to the creation I made:) Have fun! pic.twitter.com / mLsI5wf9Jg"
-  01_strip_entity_tag      | "So I spent a couple of hours doing something for fun... If you don't know that I'm a huge @ Borderlands fan and Maya is one of my favorite characters, I decided to make a wallpaper for my PC.. Here's the original picture compared to the creation I made:) Have fun! pic.twitter.com / mLsI5wf9Jg"
-  02_unescape_html         | "So I spent a couple of hours doing something for fun... If you don't know that I'm a huge @ Borderlands fan and Maya is one of my favorite characters, I decided to make a wallpaper for my PC.. Here's the original picture compared to the creation I made:) Have fun! pic.twitter.com / mLsI5wf9Jg"
-  03_remove_urls           | "So I spent a couple of hours doing something for fun... If you don't know that I'm a huge @ Borderlands fan and Maya is one of my favorite characters, I decided to make a wallpaper for my PC.. Here's the original picture compared to the creation I made:) Have fun!  "
-  04_remove_mentions       | "So I spent a couple of hours doing something for fun... If you don't know that I'm a huge   fan and Maya is one of my favorite characters, I decided to make a wallpaper for my PC.. Here's the original picture compared to the creation I made:) Have fun!  "
-  05_unwrap_hashtags       | "So I spent a couple of hours doing something for fun... If you don't know that I'm a huge   fan and Maya is one of my favorite characters, I decided to make a wallpaper for my PC.. Here's the original picture compared to the creation I made:) Have fun!  "
-  06_lowercase             | "so i spent a couple of hours doing something for fun... if you don't know that i'm a huge   fan and maya is one of my favorite characters, i decided to make a wallpaper for my pc.. here's the original picture compared to the creation i made:) have fun!  "
-  07_expand_contractions   | 'so i spent a couple of hours doing something for fun... if you do not know that i am a huge   fan and maya is one of my favorite characters, i decided to make a wallpaper for my pc.. here is the original picture compared to the creation i made:) have fun!  '
-  08_squash_elongation     | 'so i spent a couple of hours doing something for fun.. if you do not know that i am a huge  fan and maya is one of my favorite characters, i decided to make a wallpaper for my pc.. here is the original picture compared to the creation i made:) have fun!  '
-  09_strip_non_letters     | 'so i spent a couple of hours doing something for fun   if you do not know that i am a huge  fan and maya is one of my favorite characters  i decided to make a wallpaper for my pc   here is the original picture compared to the creation i made   have fun   '
-  10_normalise_space       | 'so i spent a couple of hours doing something for fun if you do not know that i am a huge fan and maya is one of my favorite characters i decided to make a wallpaper for my pc here is the original picture compared to the creation i made have fun'
-  11_tokenized             | ['so', 'i', 'spent', 'a', 'couple', 'of', 'hours', 'doing', 'something', 'for', 'fun', 'if', 'you', 'do', 'not', 'know', 'that', 'i', 'am', 'a', 'huge', 'fan', 'and', 'maya', 'is', 'one', 'of', 'my', 'favorite', 'characters', 'i', 'decided', 'to', 'make', 'a', 'wallpaper', 'for', 'my', 'pc', 'here', 'is', 'the', 'original', 'picture', 'compared', 'to', 'the', 'creation', 'i', 'made', 'have', 'fun']
-  12_stopwords_removed     | ['spent', 'couple', 'hours', 'something', 'fun', 'not', 'know', 'huge', 'fan', 'maya', 'one', 'favorite', 'characters', 'decided', 'make', 'wallpaper', 'pc', 'original', 'picture', 'compared', 'creation', 'made', 'fun']
-  13_lemmatized            | ['spent', 'couple', 'hour', 'something', 'fun', 'not', 'know', 'huge', 'fan', 'maya', 'one', 'favorite', 'character', 'decide', 'make', 'wallpaper', 'pc', 'original', 'picture', 'compare', 'creation', 'make', 'fun']
-  14_short_dropped         | ['spent', 'couple', 'hour', 'something', 'fun', 'not', 'know', 'huge', 'fan', 'maya', 'one', 'favorite', 'character', 'decide', 'make', 'wallpaper', 'pc', 'original', 'picture', 'compare', 'creation', 'make', 'fun']
-  >> CLEANED TEXT          | 'spent couple hour something fun not know huge fan maya one favorite character decide make wallpaper pc original picture compare creation make fun'
+  00_raw                   | "I'll believe it when I see it but every way I'm excited"
+  01_strip_entity_tag      | "I'll believe it when I see it but every way I'm excited"
+  02_unescape_html         | "I'll believe it when I see it but every way I'm excited"
+  03_remove_urls           | "I'll believe it when I see it but every way I'm excited"
+  04_remove_mentions       | "I'll believe it when I see it but every way I'm excited"
+  05_unwrap_hashtags       | "I'll believe it when I see it but every way I'm excited"
+  06_lowercase             | "i'll believe it when i see it but every way i'm excited"
+  07_expand_contractions   | 'i will believe it when i see it but every way i am excited'
+  08_squash_elongation     | 'i will believe it when i see it but every way i am excited'
+  09_strip_symbols         | 'i will believe it when i see it but every way i am excited'
+  10_normalise_space       | 'i will believe it when i see it but every way i am excited'
+  11_tokenized             | ['i', 'will', 'believe', 'it', 'when', 'i', 'see', 'it', 'but', 'every', 'way', 'i', 'am', 'excited']
+  12_numeric_dropped       | ['i', 'will', 'believe', 'it', 'when', 'i', 'see', 'it', 'but', 'every', 'way', 'i', 'am', 'excited']
+  13_stopwords_removed     | ['believe', 'see', 'but', 'every', 'way', 'excited']
+  14_lemmatized            | ['believe', 'see', 'but', 'every', 'way', 'excite']
+  15_short_dropped         | ['believe', 'see', 'but', 'every', 'way', 'excite']
+  >> CLEANED TEXT          | 'believe see but every way excite'
 
 ------------------------------------------------------------------------------
-tweet id=35   entity=Borderlands   label=Positive
+id=6   entity=Borderlands   label=Positive
 ------------------------------------------------------------------------------
-  00_raw                   | '[Borderlands] WE FINISHED BORDERLANDS 3 AND FINALLY YAS! Thank you everyone for hanging out everyone! It was fun. I will try to make stream tomorrow but if not I might make so some IRL streams while awayu. 10 We never shall see. Thank you both so... much for the raids @mompou_mumpow or @MegaMagwitch and 4 @KfdMitch.'
-  01_strip_entity_tag      | 'WE FINISHED BORDERLANDS 3 AND FINALLY YAS! Thank you everyone for hanging out everyone! It was fun. I will try to make stream tomorrow but if not I might make so some IRL streams while awayu. 10 We never shall see. Thank you both so... much for the raids @mompou_mumpow or @MegaMagwitch and 4 @KfdMitch.'
-  02_unescape_html         | 'WE FINISHED BORDERLANDS 3 AND FINALLY YAS! Thank you everyone for hanging out everyone! It was fun. I will try to make stream tomorrow but if not I might make so some IRL streams while awayu. 10 We never shall see. Thank you both so... much for the raids @mompou_mumpow or @MegaMagwitch and 4 @KfdMitch.'
-  03_remove_urls           | 'WE FINISHED BORDERLANDS 3 AND FINALLY YAS! Thank you everyone for hanging out everyone! It was fun. I will try to make stream tomorrow but if not I might make so some IRL streams while awayu. 10 We never shall see. Thank you both so... much for the raids @mompou_mumpow or @MegaMagwitch and 4 @KfdMitch.'
-  04_remove_mentions       | 'WE FINISHED BORDERLANDS 3 AND FINALLY YAS! Thank you everyone for hanging out everyone! It was fun. I will try to make stream tomorrow but if not I might make so some IRL streams while awayu. 10 We never shall see. Thank you both so... much for the raids   or   and 4  .'
-  05_unwrap_hashtags       | 'WE FINISHED BORDERLANDS 3 AND FINALLY YAS! Thank you everyone for hanging out everyone! It was fun. I will try to make stream tomorrow but if not I might make so some IRL streams while awayu. 10 We never shall see. Thank you both so... much for the raids   or   and 4  .'
-  06_lowercase             | 'we finished borderlands 3 and finally yas! thank you everyone for hanging out everyone! it was fun. i will try to make stream tomorrow but if not i might make so some irl streams while awayu. 10 we never shall see. thank you both so... much for the raids   or   and 4  .'
-  07_expand_contractions   | 'we finished borderlands 3 and finally yas! thank you everyone for hanging out everyone! it was fun. i will try to make stream tomorrow but if not i might make so some irl streams while awayu. 10 we never shall see. thank you both so... much for the raids   or   and 4  .'
-  08_squash_elongation     | 'we finished borderlands 3 and finally yas! thank you everyone for hanging out everyone! it was fun. i will try to make stream tomorrow but if not i might make so some irl streams while awayu. 10 we never shall see. thank you both so.. much for the raids  or  and 4  .'
-  09_strip_non_letters     | 'we finished borderlands   and finally yas  thank you everyone for hanging out everyone  it was fun  i will try to make stream tomorrow but if not i might make so some irl streams while awayu     we never shall see  thank you both so   much for the raids  or  and     '
-  10_normalise_space       | 'we finished borderlands and finally yas thank you everyone for hanging out everyone it was fun i will try to make stream tomorrow but if not i might make so some irl streams while awayu we never shall see thank you both so much for the raids or and'
-  11_tokenized             | ['we', 'finished', 'borderlands', 'and', 'finally', 'yas', 'thank', 'you', 'everyone', 'for', 'hanging', 'out', 'everyone', 'it', 'was', 'fun', 'i', 'will', 'try', 'to', 'make', 'stream', 'tomorrow', 'but', 'if', 'not', 'i', 'might', 'make', 'so', 'some', 'irl', 'streams', 'while', 'awayu', 'we', 'never', 'shall', 'see', 'thank', 'you', 'both', 'so', 'much', 'for', 'the', 'raids', 'or', 'and']
-  12_stopwords_removed     | ['finished', 'borderlands', 'finally', 'yas', 'thank', 'everyone', 'hanging', 'everyone', 'fun', 'try', 'make', 'stream', 'tomorrow', 'but', 'not', 'might', 'make', 'irl', 'streams', 'awayu', 'never', 'shall', 'see', 'thank', 'much', 'raids']
-  13_lemmatized            | ['finish', 'borderland', 'finally', 'yas', 'thank', 'everyone', 'hang', 'everyone', 'fun', 'try', 'make', 'stream', 'tomorrow', 'but', 'not', 'might', 'make', 'irl', 'stream', 'awayu', 'never', 'shall', 'see', 'thank', 'much', 'raid']
-  14_short_dropped         | ['finish', 'borderland', 'finally', 'yas', 'thank', 'everyone', 'hang', 'everyone', 'fun', 'try', 'make', 'stream', 'tomorrow', 'but', 'not', 'might', 'make', 'irl', 'stream', 'awayu', 'never', 'shall', 'see', 'thank', 'much', 'raid']
-  >> CLEANED TEXT          | 'finish borderland finally yas thank everyone hang everyone fun try make stream tomorrow but not might make irl stream awayu never shall see thank much raid'
+  00_raw                   | 'Thank you so much to members who came out to @borderlands_sf Monday to witness @megelison and I talking about queer families, skillsharing, and fighting fascism through caring for our communities! what you great night.'
+  01_strip_entity_tag      | 'Thank you so much to members who came out to @borderlands_sf Monday to witness @megelison and I talking about queer families, skillsharing, and fighting fascism through caring for our communities! what you great night.'
+  02_unescape_html         | 'Thank you so much to members who came out to @borderlands_sf Monday to witness @megelison and I talking about queer families, skillsharing, and fighting fascism through caring for our communities! what you great night.'
+  03_remove_urls           | 'Thank you so much to members who came out to @borderlands_sf Monday to witness @megelison and I talking about queer families, skillsharing, and fighting fascism through caring for our communities! what you great night.'
+  04_remove_mentions       | 'Thank you so much to members who came out to   Monday to witness   and I talking about queer families, skillsharing, and fighting fascism through caring for our communities! what you great night.'
+  05_unwrap_hashtags       | 'Thank you so much to members who came out to   Monday to witness   and I talking about queer families, skillsharing, and fighting fascism through caring for our communities! what you great night.'
+  06_lowercase             | 'thank you so much to members who came out to   monday to witness   and i talking about queer families, skillsharing, and fighting fascism through caring for our communities! what you great night.'
+  07_expand_contractions   | 'thank you so much to members who came out to   monday to witness   and i talking about queer families, skillsharing, and fighting fascism through caring for our communities! what you great night.'
+  08_squash_elongation     | 'thank you so much to members who came out to  monday to witness  and i talking about queer families, skillsharing, and fighting fascism through caring for our communities! what you great night.'
+  09_strip_symbols         | 'thank you so much to members who came out to  monday to witness  and i talking about queer families  skillsharing  and fighting fascism through caring for our communities  what you great night '
+  10_normalise_space       | 'thank you so much to members who came out to monday to witness and i talking about queer families skillsharing and fighting fascism through caring for our communities what you great night'
+  11_tokenized             | ['thank', 'you', 'so', 'much', 'to', 'members', 'who', 'came', 'out', 'to', 'monday', 'to', 'witness', 'and', 'i', 'talking', 'about', 'queer', 'families', 'skillsharing', 'and', 'fighting', 'fascism', 'through', 'caring', 'for', 'our', 'communities', 'what', 'you', 'great', 'night']
+  12_numeric_dropped       | ['thank', 'you', 'so', 'much', 'to', 'members', 'who', 'came', 'out', 'to', 'monday', 'to', 'witness', 'and', 'i', 'talking', 'about', 'queer', 'families', 'skillsharing', 'and', 'fighting', 'fascism', 'through', 'caring', 'for', 'our', 'communities', 'what', 'you', 'great', 'night']
+  13_stopwords_removed     | ['thank', 'much', 'members', 'came', 'monday', 'witness', 'talking', 'queer', 'families', 'skillsharing', 'fighting', 'fascism', 'caring', 'communities', 'great', 'night']
+  14_lemmatized            | ['thank', 'much', 'member', 'come', 'monday', 'witness', 'talk', 'queer', 'family', 'skillsharing', 'fight', 'fascism', 'care', 'community', 'great', 'night']
+  15_short_dropped         | ['thank', 'much', 'member', 'come', 'monday', 'witness', 'talk', 'queer', 'family', 'skillsharing', 'fight', 'fascism', 'care', 'community', 'great', 'night']
+  >> CLEANED TEXT          | 'thank much member come monday witness talk queer family skillsharing fight fascism care community great night'
+
+------------------------------------------------------------------------------
+id=9   entity=Nvidia   label=Irrelevant
+------------------------------------------------------------------------------
+  00_raw                   | 'Attacked again IBM, AMD releases RX 6000 dual accelerator cards: lower reviews tnewspro.com/2020/10/29/att...'
+  01_strip_entity_tag      | 'Attacked again IBM, AMD releases RX 6000 dual accelerator cards: lower reviews tnewspro.com/2020/10/29/att...'
+  02_unescape_html         | 'Attacked again IBM, AMD releases RX 6000 dual accelerator cards: lower reviews tnewspro.com/2020/10/29/att...'
+  03_remove_urls           | 'Attacked again IBM, AMD releases RX 6000 dual accelerator cards: lower reviews  '
+  04_remove_mentions       | 'Attacked again IBM, AMD releases RX 6000 dual accelerator cards: lower reviews  '
+  05_unwrap_hashtags       | 'Attacked again IBM, AMD releases RX 6000 dual accelerator cards: lower reviews  '
+  06_lowercase             | 'attacked again ibm, amd releases rx 6000 dual accelerator cards: lower reviews  '
+  07_expand_contractions   | 'attacked again ibm, amd releases rx 6000 dual accelerator cards: lower reviews  '
+  08_squash_elongation     | 'attacked again ibm, amd releases rx 600 dual accelerator cards: lower reviews  '
+  09_strip_symbols         | 'attacked again ibm  amd releases rx 600 dual accelerator cards  lower reviews  '
+  10_normalise_space       | 'attacked again ibm amd releases rx 600 dual accelerator cards lower reviews'
+  11_tokenized             | ['attacked', 'again', 'ibm', 'amd', 'releases', 'rx', '600', 'dual', 'accelerator', 'cards', 'lower', 'reviews']
+  12_numeric_dropped       | ['attacked', 'again', 'ibm', 'amd', 'releases', 'rx', 'dual', 'accelerator', 'cards', 'lower', 'reviews']
+  13_stopwords_removed     | ['attacked', 'ibm', 'amd', 'releases', 'rx', 'dual', 'accelerator', 'cards', 'lower', 'reviews']
+  14_lemmatized            | ['attacked', 'ibm', 'amd', 'release', 'rx', 'dual', 'accelerator', 'card', 'low', 'review']
+  15_short_dropped         | ['attacked', 'ibm', 'amd', 'release', 'rx', 'dual', 'accelerator', 'card', 'low', 'review']
+  >> CLEANED TEXT          | 'attacked ibm amd release rx dual accelerator card low review'
+
+------------------------------------------------------------------------------
+id=57   entity=Fortnite   label=Positive
+------------------------------------------------------------------------------
+  00_raw                   | 'A new game racing mode called " Liferun " will be added to Fortnite very effective soon! It will first ever be showcased at PAX South in a few extra days.... In this game mode you\'ll play here as only a Red Green Cross Society Worker with racing to always save the lives of characters in 4 different missions!. via ) @AdamGrenade im excited!'
+  01_strip_entity_tag      | 'A new game racing mode called " Liferun " will be added to Fortnite very effective soon! It will first ever be showcased at PAX South in a few extra days.... In this game mode you\'ll play here as only a Red Green Cross Society Worker with racing to always save the lives of characters in 4 different missions!. via ) @AdamGrenade im excited!'
+  02_unescape_html         | 'A new game racing mode called " Liferun " will be added to Fortnite very effective soon! It will first ever be showcased at PAX South in a few extra days.... In this game mode you\'ll play here as only a Red Green Cross Society Worker with racing to always save the lives of characters in 4 different missions!. via ) @AdamGrenade im excited!'
+  03_remove_urls           | 'A new game racing mode called " Liferun " will be added to Fortnite very effective soon! It will first ever be showcased at PAX South in a few extra days.... In this game mode you\'ll play here as only a Red Green Cross Society Worker with racing to always save the lives of characters in 4 different missions!. via ) @AdamGrenade im excited!'
+  04_remove_mentions       | 'A new game racing mode called " Liferun " will be added to Fortnite very effective soon! It will first ever be showcased at PAX South in a few extra days.... In this game mode you\'ll play here as only a Red Green Cross Society Worker with racing to always save the lives of characters in 4 different missions!. via )   im excited!'
+  05_unwrap_hashtags       | 'A new game racing mode called " Liferun " will be added to Fortnite very effective soon! It will first ever be showcased at PAX South in a few extra days.... In this game mode you\'ll play here as only a Red Green Cross Society Worker with racing to always save the lives of characters in 4 different missions!. via )   im excited!'
+  06_lowercase             | 'a new game racing mode called " liferun " will be added to fortnite very effective soon! it will first ever be showcased at pax south in a few extra days.... in this game mode you\'ll play here as only a red green cross society worker with racing to always save the lives of characters in 4 different missions!. via )   im excited!'
+  07_expand_contractions   | 'a new game racing mode called " liferun " will be added to fortnite very effective soon! it will first ever be showcased at pax south in a few extra days.... in this game mode you will play here as only a red green cross society worker with racing to always save the lives of characters in 4 different missions!. via )   i am excited!'
+  08_squash_elongation     | 'a new game racing mode called " liferun " will be added to fortnite very effective soon! it will first ever be showcased at pax south in a few extra days.. in this game mode you will play here as only a red green cross society worker with racing to always save the lives of characters in 4 different missions!. via )  i am excited!'
+  09_strip_symbols         | 'a new game racing mode called   liferun   will be added to fortnite very effective soon  it will first ever be showcased at pax south in a few extra days   in this game mode you will play here as only a red green cross society worker with racing to always save the lives of characters in 4 different missions   via    i am excited '
+  10_normalise_space       | 'a new game racing mode called liferun will be added to fortnite very effective soon it will first ever be showcased at pax south in a few extra days in this game mode you will play here as only a red green cross society worker with racing to always save the lives of characters in 4 different missions via i am excited'
+  11_tokenized             | ['a', 'new', 'game', 'racing', 'mode', 'called', 'liferun', 'will', 'be', 'added', 'to', 'fortnite', 'very', 'effective', 'soon', 'it', 'will', 'first', 'ever', 'be', 'showcased', 'at', 'pax', 'south', 'in', 'a', 'few', 'extra', 'days', 'in', 'this', 'game', 'mode', 'you', 'will', 'play', 'here', 'as', 'only', 'a', 'red', 'green', 'cross', 'society', 'worker', 'with', 'racing', 'to', 'always', 'save', 'the', 'lives', 'of', 'characters', 'in', '4', 'different', 'missions', 'via', 'i', 'am', 'excited']
+  12_numeric_dropped       | ['a', 'new', 'game', 'racing', 'mode', 'called', 'liferun', 'will', 'be', 'added', 'to', 'fortnite', 'very', 'effective', 'soon', 'it', 'will', 'first', 'ever', 'be', 'showcased', 'at', 'pax', 'south', 'in', 'a', 'few', 'extra', 'days', 'in', 'this', 'game', 'mode', 'you', 'will', 'play', 'here', 'as', 'only', 'a', 'red', 'green', 'cross', 'society', 'worker', 'with', 'racing', 'to', 'always', 'save', 'the', 'lives', 'of', 'characters', 'in', 'different', 'missions', 'via', 'i', 'am', 'excited']
+  13_stopwords_removed     | ['new', 'game', 'racing', 'mode', 'called', 'liferun', 'added', 'fortnite', 'very', 'effective', 'soon', 'first', 'ever', 'showcased', 'pax', 'south', 'extra', 'days', 'game', 'mode', 'play', 'red', 'green', 'cross', 'society', 'worker', 'racing', 'always', 'save', 'lives', 'characters', 'different', 'missions', 'excited']
+  14_lemmatized            | ['new', 'game', 'race', 'mode', 'call', 'liferun', 'add', 'fortnite', 'very', 'effective', 'soon', 'first', 'ever', 'showcased', 'pax', 'south', 'extra', 'day', 'game', 'mode', 'play', 'red', 'green', 'cross', 'society', 'worker', 'race', 'always', 'save', 'live', 'character', 'different', 'mission', 'excite']
+  15_short_dropped         | ['new', 'game', 'race', 'mode', 'call', 'liferun', 'add', 'fortnite', 'very', 'effective', 'soon', 'first', 'ever', 'showcased', 'pax', 'south', 'extra', 'day', 'game', 'mode', 'play', 'red', 'green', 'cross', 'society', 'worker', 'race', 'always', 'save', 'live', 'character', 'different', 'mission', 'excite']
+  >> CLEANED TEXT          | 'new game race mode call liferun add fortnite very effective soon first ever showcased pax south extra day game mode play red green cross society worker race always save live character different mission excite'
 
 
-[3] WHY LEMMATIZATION AND NOT STEMMING
-    The brief says choose one. I chose lemmatization because Porter stemming
-    mangles words into non-words, which makes the cleaned corpus unreadable
-    for the sentiment analysis this dataset is for:
+[3] LEMMATIZATION, NOT STEMMING
+    The brief says choose one. Porter stemming mangles words into
+    non-words, destroying the terms that carry the sentiment:
 
     word             PorterStemmer      WordNetLemmatizer 
     murdering        murder             murder            
-    coming           come               come              
     games            game               game              
     better           better             good              
-    crashes          crash              crash             
     really           realli             really            
     terrible         terribl            terrible          
     communities      commun             community         
     was              wa                 be                
     studying         studi              study             
 
-    'terrible' -> 'terribl' and 'really' -> 'realli' are the clearest losses:
-    both are strong sentiment carriers and both survive lemmatization intact.
+    'terrible' -> 'terribl' and 'really' -> 'realli' are the clearest
+    losses: both are strong sentiment carriers, both survive lemmatization.
 
 
-[4] STOPWORDS - what I removed and what I deliberately kept
-    nltk english stopword list : 198 words
-    words I put back           : 31
-    effective stopword list    : 172 words
+[4] PROPER NOUNS ARE PROTECTED
+    Product and game names are POS-tagged NNP/NNPS and skipped by the
+    lemmatizer, plus every word of the row's entity value. Without this,
+    'Borderlands' becomes 'borderland' and no longer matches the entity
+    column the corpus is annotated against.
+
+
+[5] STOPWORDS - removed vs deliberately kept
+    nltk english list      : 198
+    + twitter noise        : 9  ['amp', 'com', 'im', 'pic', 'rt', 'twitter', 'u', 'ur', 'via']
+    - negations put back   : 31
+    effective stopword list: 181
 
     Kept on purpose: against, aren, but, cannot, couldn, didn, doesn, don, down, hadn, hasn, haven, isn, n't, never, no, none, nor, not, nothing, off, over, shouldn, too, under, up, very, wasn, weren, won, wouldn
-    Reason: negation flips polarity. Dropping 'not' turns "not good" into
-    "good", which would silently corrupt every Negative tweet in the corpus.
+    Negation flips polarity: dropping 'not' turns "not good" into "good".
 
 
-[5] CORPUS STATISTICS - before vs after
-                    before    after reduction
-total tokens       2876.00  1232.00     57.2%
-vocabulary size     435.00   266.00     38.9%
-mean tokens/tweet    28.76    12.32     57.2%
-longest tweet        65.00    32.00     50.8%
+[6] CORPUS STATISTICS
+                  before    after reduction
+total tokens     2327.00  1116.00     52.0%
+vocabulary size   979.00   698.00     28.7%
+mean tokens/doc    23.27    11.16     52.0%
+longest doc        69.00    34.00     50.7%
 
-    documents that became EMPTY after cleaning: 8
-    (these were punctuation-only or stopword-only tweets - exactly the ones
-     the annotators disagreed most about in step 2)
-      id=12   label=Irrelevant raw='[Borderlands] was'
-      id=54   label=Irrelevant raw='[Borderlands] all'
-      id=61   label=Irrelevant raw='[Borderlands]  . . ['
-      id=62   label=Irrelevant raw='[Borderlands]'
-      id=63   label=Irrelevant raw='[Borderlands] .. ['
-      id=64   label=Irrelevant raw='[Borderlands] .. 45'
-      id=65   label=Irrelevant raw='[Borderlands] .. ['
-      id=66   label=Irrelevant raw='[Borderlands] .. what'
+    documents empty after cleaning: 0
 
 
-[6] TOP 15 LEMMAS PER SENTIMENT CLASS  (sanity check that cleaning kept the signal)
-    (a tweet labelled 'Irrelevant#Neutral' counts under BOTH headings)
+[7] TOP 15 LEMMAS PER CLASS
+    (a document labelled 'Irrelevant#Neutral' counts under BOTH headings)
 
-    Positive (46 tweets, 511 tokens)
-      borderland(20), fun(18), get(15), stream(15), make(14), go(13), good(12), not(11), really(11), finish(11), hour(10), thank(10), up(10), kill(8), first(6)
+    Positive (42 docs, 539 tokens)
+      game(10), see(8), play(8), new(7), come(6), thanks(5), not(5), go(5), time(5), cannot(5), great(4), but(4), get(4), league(4), first(4)
 
-    Negative (22 tweets, 344 tokens)
-      drop(18), really(15), borderland(12), get(12), man(10), cannot(8), big(6), life(6), come(6), year(6), ago(6), fix(6), new(6), boss(6), mayhem(6)
+    Negative (38 docs, 433 tokens)
+      play(6), really(6), game(6), but(6), microsoft(6), like(5), new(4), no(4), go(4), get(4), not(4), one(3), dead(3), ps5(3), still(3)
 
-    Neutral (18 tweets, 301 tokens)
-      modifier(17), shout(13), mayhem(12), catch(8), one(7), live(6), say(6), chat(6), chance(6), hate(6), event(6), last(6), forever(6), fun(6), game(6)
+    Neutral (14 docs, 132 tokens)
+      use(3), well(3), krieg(2), gold(2), unk(2), co(2), microsoft(2), something(2), nothing(2), think(2), borderlands(1), jesse(1), music(1), meets(1), princess(1)
 
-    Irrelevant (14 tweets, 76 tokens)
-      hard(6), la(6), rare(6), handsome(6), xbox(6), rmtrgf(6), rock(5), powerful(5), jackpot(5), borderlands(5), dlvr(5), varlope(4), live(2), dfr(1), vita(1)
-
-
-[7] FILES PRODUCED
-    /home/sherlock/Desktop/sentiment_annotation/data/cleaned_corpus.csv  - id, entity, label, raw text, cleaned text, tokens
-    /home/sherlock/Desktop/sentiment_annotation/reports/preprocessing_report.txt - this file
+    Irrelevant (16 docs, 107 tokens)
+      rhandlerr(3), krieg(2), watch(2), ban(2), player(2), best(2), mean(2), oled(2), core(2), borderlands(1), jesse(1), music(1), meets(1), princess(1), maya(1)
