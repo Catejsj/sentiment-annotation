@@ -14,13 +14,13 @@ Pipeline order, as instructed: **annotate → augment → preprocess.**
 |---|---|---|---|
 | 1 | Your annotation | `1_my_annotation.csv` | 100 tweets, all labelled |
 | 1 | Your inter-annotator agreements | `1_inter_annotator_agreement.txt` | Cohen's + Fleiss' kappa, 5 annotators |
-| 2 | Your augmented dataset (**added to the original**) | `2_augmented_dataset.csv` | 698 rows = 100 original + 598 augmented |
-| 3 | Your cleaned dataset after preprocessing | `3_cleaned_dataset.csv` | 698 rows preprocessed |
+| 2 | Your augmented dataset (**added to the original**) | `2_augmented_dataset.csv` | 699 rows = 100 original + 599 augmented |
+| 3 | Your cleaned dataset after preprocessing | `3_cleaned_dataset.csv` | 699 rows preprocessed |
 
 ### "perform data augmentation as well before preprocessing"
 
 Augmentation runs on the **raw** annotated corpus; preprocessing runs on the
-**output of augmentation**. Evidence: `3_cleaned_dataset.csv` has 698 rows — it
+**output of augmentation**. Evidence: `3_cleaned_dataset.csv` has 699 rows — it
 could only have that many if augmentation happened first.
 
 ### "Group 1 and Group 2: random swapping, random insertion, random deletion"
@@ -28,7 +28,7 @@ could only have that many if augmentation happened first.
 | Technique | TextAttack class | Rows produced |
 |---|---|---|
 | Random swapping | `WordInnerSwapRandom` | 200 |
-| Random insertion | `WordInsertionRandomSynonym` | 198 |
+| Random insertion | `WordInsertionRandomSynonym` | 199 |
 | Random deletion | `WordDeletion` | 200 |
 
 Full detail in `2_augmentation_report.txt`.
@@ -47,7 +47,7 @@ Full detail in `2_augmentation_report.txt`.
 
 `3_preprocessing_report.txt` section [2] shows every stage on 5 real tweets.
 `3_cleaned_dataset.csv` has `raw_text` and `cleaned_text` side by side.
-`3_preprocessing_stages.csv` has the output of all 15 stages for all 698 rows.
+`3_preprocessing_stages.csv` has the output of all 15 stages for all 699 rows.
 
 ---
 
@@ -55,12 +55,12 @@ Full detail in `2_augmentation_report.txt`.
 
 ### 1. Inter-annotator agreement
 
-6 annotators over the same 100 tweets.
+5 genuine annotators over the same 100 tweets (see note below).
 
 | Metric | Value | Interpretation |
 |---|---|---|
-| **Fleiss' kappa** | **0.495** | moderate |
-| Mean pairwise Cohen's kappa | 0.502 | moderate |
+| **Fleiss' kappa** | **0.427** | moderate |
+| Mean pairwise Cohen's kappa | 0.434 | moderate |
 | Strongest pair | 0.826 | almost perfect |
 | Weakest pair | 0.152 | slight |
 
@@ -70,14 +70,22 @@ over Negative (24) where others were near-even. The guideline never defined the
 boundary between "Neutral" and a weak polarity, and that single ambiguity
 accounts for most of the lost agreement.
 
-**Note on rater count.** Two submitted files carried identical primary labels on
-all 100 tweets, differing only in second labels on 7 rows. They are counted once,
-as a single rater. Including both would have scored kappa 1.000 for that pair and
-inflated the group figure.
+**Note on rater count.** Six files were submitted, but two of them carry
+identical primary labels on all 100 tweets, differing only in second labels on
+7 rows. That pair scores kappa 1.000 against each other, which pulls the group
+average up. Both figures are reported for transparency:
+
+| Raters counted | Fleiss' kappa | Mean pairwise Cohen's kappa |
+|---|---|---|
+| All 6 files as submitted | 0.495 | 0.502 |
+| 5, treating the identical pair as one rater | **0.427** | **0.434** |
+
+The 5-rater figure is the honest one, since two independent annotators do not
+produce identical labels on 100 tweets.
 
 ### 2. Augmented dataset
 
-100 original tweets → **698 rows** (originals retained, as instructed).
+100 original tweets → **699 rows** (originals retained, as instructed).
 Random seed 42, so the file reproduces exactly on a rerun.
 
 Label balance is preserved to within 0.4 percentage points across all classes —
@@ -96,8 +104,9 @@ Two safety guards run on every generated variant:
 
 | | Before | After | Reduction |
 |---|---|---|---|
-| Total tokens | 16,126 | 7,858 | 51.3% |
-| Mean tokens/document | 23.1 | 11.3 | 51.3% |
+| Total tokens | 16,147 | 7,857 | 51.3% |
+| Vocabulary size | 1,289 | 981 | 23.9% |
+| Mean tokens/document | 23.1 | 11.2 | 51.3% |
 
 ---
 
