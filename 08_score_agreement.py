@@ -23,8 +23,10 @@ Libraries: scikit-learn (Cohen), statsmodels (Fleiss).
 """
 import os
 import sys
+import unicodedata
 from itertools import combinations
 
+import ftfy
 import pandas as pd
 from sklearn.metrics import cohen_kappa_score
 from statsmodels.stats.inter_rater import aggregate_raters, fleiss_kappa
@@ -51,8 +53,17 @@ def interpret(k: float) -> str:
 
 
 def norm_text(s: pd.Series) -> pd.Series:
+    """Normalise a text column so the same tweet matches across everyone's export.
+
+    The mojibake repair matters: if one person's CSV is opened and re-saved in a
+    spreadsheet with the wrong encoding, UTF-8 gets reinterpreted as Latin-1 and
+    "johnson's" becomes "johnsonaEUR(TM)s". Those rows then fail to match anyone
+    else's copy even though it is the same tweet. ftfy reverses that.
+    """
     return (
         s.astype(str)
+        .map(ftfy.fix_text)                                  # repair mojibake
+        .map(lambda v: unicodedata.normalize("NFC", v))      # unify accents/emoji
         .str.replace(r"^\s*\[[^\]]+\]\s*", "", regex=True)   # old [Entity] prefix
         .str.lower()
         .str.replace(r"\s+", " ", regex=True)
@@ -72,6 +83,8 @@ def load(path: str) -> pd.DataFrame:
         }
     )
     out["text_key"] = norm_text(df["text"])
+    # kept as a plain column too, since text_key may become the index later
+    out["norm"] = out["text_key"]
     id_col = "id" if "id" in df.columns else ("row" if "row" in df.columns else None)
     out["id_key"] = df[id_col] if id_col else None
     out["labels"] = out["raw"].apply(lambda v: frozenset(p for p in v.split("#") if p))
@@ -160,10 +173,12 @@ def main() -> None:
         return
     ids = sorted(common)
 
-    ref = frames[names[0]].loc[ids, "text"]
+    # compare the NORMALISED text, the same form the join used - raw text can
+    # differ harmlessly in case or encoding between two exports of one tweet
+    ref = frames[names[0]].loc[ids, "norm"]
     mismatched = []
     for n in names[1:]:
-        diff = (frames[n].loc[ids, "text"].str.strip() != ref.str.strip()).sum()
+        diff = (frames[n].loc[ids, "norm"] != ref).sum()
         if diff:
             mismatched.append((n, diff))
     if mismatched:
@@ -176,6 +191,22 @@ def main() -> None:
 
     data = pd.DataFrame({n: frames[n].loc[ids, "primary"] for n in names})
     sets = pd.DataFrame({n: frames[n].loc[ids, "labels"] for n in names})
+
+    # Two files with identical labels are the same person submitted twice. Left
+    # in, that pair scores kappa 1.000 and drags the group mean up for free.
+    twins = [(a, b) for a, b in combinations(names, 2) if data[a].equals(data[b])]
+    if twins:
+        push("\n    [!] these files have IDENTICAL primary labels on all documents:")
+        for a, b in twins:
+            same_sets = sets[a].equals(sets[b])
+            detail = "byte-for-byte the same annotation" if same_sets else (
+                f"differ only in second labels on "
+                f"{int((sets[a] != sets[b]).sum())} rows"
+            )
+            push(f"          {a}  ==  {b}    ({detail})")
+        push("        Two independent annotators do not produce identical labels on")
+        push("        100 tweets. Treat these as ONE rater: a duplicate scores kappa")
+        push("        1.000 against itself and inflates the whole group's agreement.")
 
     blank = (data == "").sum()
     if blank.any():
