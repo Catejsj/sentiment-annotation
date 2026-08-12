@@ -1,0 +1,14 @@
+# virtualenv - 5.6 GB because TextAttack pulls in torch + CUDA
+.venv/
+venv/
+
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# NLTK / HuggingFace caches
+nltk_data/
+.cache/
+
+.DS_Store
+*.swp

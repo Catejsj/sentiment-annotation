@@ -1,0 +1,173 @@
+==============================================================================
+TEXT PREPROCESSING REPORT  -  Twitter sentiment corpus (698 annotated tweets)
+source: data/augmented_corpus.csv (exported from Doccano)
+entities covered: 28
+==============================================================================
+
+[1] PIPELINE - the order matters
+
+    raw tweet
+      01 strip the [Entity] tag Doccano adds
+      02 unescape HTML entities        (&amp;  -> &)
+      03 remove URLs
+      04 remove @mentions
+      05 unwrap #hashtags              (#BoT   -> BoT)
+      06 lowercase
+      07 EXPAND CONTRACTIONS           (don't  -> do not)      <-- required
+      08 squash elongations            (soooo  -> soo)
+      09 remove emoji / digits / punctuation
+      10 normalise whitespace
+      11 WORD TOKENIZATION             (nltk TweetTokenizer)   <-- required
+      12 STOPWORDS REMOVAL             (nltk, negations kept)  <-- required
+      13 LEMMATIZATION                 (WordNet + POS tags)    <-- required
+      14 drop 1-character tokens
+
+    Two ordering decisions worth defending in the write-up:
+      * contraction expansion (07) MUST come before punctuation removal (09).
+        Reverse them and "don't" becomes "dont", which no expander recognises.
+      * lemmatization (13) comes after stopword removal (12) so we lemmatize
+        fewer tokens, and after lowercasing so WordNet lookups actually hit.
+
+[2] STAGE-BY-STAGE ON REAL TWEETS  (this is the 'cleaned text' view)
+
+------------------------------------------------------------------------------
+tweet id=8   entity=CallOfDutyBlackopsColdWar   label=Positive
+------------------------------------------------------------------------------
+  00_raw                   | "I'll believe it when I see it but every way I'm excited"
+  01_strip_entity_tag      | "I'll believe it when I see it but every way I'm excited"
+  02_unescape_html         | "I'll believe it when I see it but every way I'm excited"
+  03_remove_urls           | "I'll believe it when I see it but every way I'm excited"
+  04_remove_mentions       | "I'll believe it when I see it but every way I'm excited"
+  05_unwrap_hashtags       | "I'll believe it when I see it but every way I'm excited"
+  06_lowercase             | "i'll believe it when i see it but every way i'm excited"
+  07_expand_contractions   | 'i will believe it when i see it but every way i am excited'
+  08_squash_elongation     | 'i will believe it when i see it but every way i am excited'
+  09_strip_non_letters     | 'i will believe it when i see it but every way i am excited'
+  10_normalise_space       | 'i will believe it when i see it but every way i am excited'
+  11_tokenized             | ['i', 'will', 'believe', 'it', 'when', 'i', 'see', 'it', 'but', 'every', 'way', 'i', 'am', 'excited']
+  12_stopwords_removed     | ['believe', 'see', 'but', 'every', 'way', 'excited']
+  13_lemmatized            | ['believe', 'see', 'but', 'every', 'way', 'excite']
+  14_short_dropped         | ['believe', 'see', 'but', 'every', 'way', 'excite']
+  >> CLEANED TEXT          | 'believe see but every way excite'
+
+------------------------------------------------------------------------------
+tweet id=6   entity=Borderlands   label=Positive
+------------------------------------------------------------------------------
+  00_raw                   | 'Thank you so much to members who came out to @borderlands_sf Monday to witness @megelison and I talking about queer families, skillsharing, and fighting fascism through caring for our communities! what you great night.'
+  01_strip_entity_tag      | 'Thank you so much to members who came out to @borderlands_sf Monday to witness @megelison and I talking about queer families, skillsharing, and fighting fascism through caring for our communities! what you great night.'
+  02_unescape_html         | 'Thank you so much to members who came out to @borderlands_sf Monday to witness @megelison and I talking about queer families, skillsharing, and fighting fascism through caring for our communities! what you great night.'
+  03_remove_urls           | 'Thank you so much to members who came out to @borderlands_sf Monday to witness @megelison and I talking about queer families, skillsharing, and fighting fascism through caring for our communities! what you great night.'
+  04_remove_mentions       | 'Thank you so much to members who came out to   Monday to witness   and I talking about queer families, skillsharing, and fighting fascism through caring for our communities! what you great night.'
+  05_unwrap_hashtags       | 'Thank you so much to members who came out to   Monday to witness   and I talking about queer families, skillsharing, and fighting fascism through caring for our communities! what you great night.'
+  06_lowercase             | 'thank you so much to members who came out to   monday to witness   and i talking about queer families, skillsharing, and fighting fascism through caring for our communities! what you great night.'
+  07_expand_contractions   | 'thank you so much to members who came out to   monday to witness   and i talking about queer families, skillsharing, and fighting fascism through caring for our communities! what you great night.'
+  08_squash_elongation     | 'thank you so much to members who came out to  monday to witness  and i talking about queer families, skillsharing, and fighting fascism through caring for our communities! what you great night.'
+  09_strip_non_letters     | 'thank you so much to members who came out to  monday to witness  and i talking about queer families  skillsharing  and fighting fascism through caring for our communities  what you great night '
+  10_normalise_space       | 'thank you so much to members who came out to monday to witness and i talking about queer families skillsharing and fighting fascism through caring for our communities what you great night'
+  11_tokenized             | ['thank', 'you', 'so', 'much', 'to', 'members', 'who', 'came', 'out', 'to', 'monday', 'to', 'witness', 'and', 'i', 'talking', 'about', 'queer', 'families', 'skillsharing', 'and', 'fighting', 'fascism', 'through', 'caring', 'for', 'our', 'communities', 'what', 'you', 'great', 'night']
+  12_stopwords_removed     | ['thank', 'much', 'members', 'came', 'monday', 'witness', 'talking', 'queer', 'families', 'skillsharing', 'fighting', 'fascism', 'caring', 'communities', 'great', 'night']
+  13_lemmatized            | ['thank', 'much', 'member', 'come', 'monday', 'witness', 'talk', 'queer', 'family', 'skillsharing', 'fight', 'fascism', 'care', 'community', 'great', 'night']
+  14_short_dropped         | ['thank', 'much', 'member', 'come', 'monday', 'witness', 'talk', 'queer', 'family', 'skillsharing', 'fight', 'fascism', 'care', 'community', 'great', 'night']
+  >> CLEANED TEXT          | 'thank much member come monday witness talk queer family skillsharing fight fascism care community great night'
+
+------------------------------------------------------------------------------
+tweet id=9   entity=Nvidia   label=Irrelevant
+------------------------------------------------------------------------------
+  00_raw                   | 'Attacked again IBM, AMD releases RX 6000 dual accelerator cards: lower reviews tnewspro.com/2020/10/29/att...'
+  01_strip_entity_tag      | 'Attacked again IBM, AMD releases RX 6000 dual accelerator cards: lower reviews tnewspro.com/2020/10/29/att...'
+  02_unescape_html         | 'Attacked again IBM, AMD releases RX 6000 dual accelerator cards: lower reviews tnewspro.com/2020/10/29/att...'
+  03_remove_urls           | 'Attacked again IBM, AMD releases RX 6000 dual accelerator cards: lower reviews  '
+  04_remove_mentions       | 'Attacked again IBM, AMD releases RX 6000 dual accelerator cards: lower reviews  '
+  05_unwrap_hashtags       | 'Attacked again IBM, AMD releases RX 6000 dual accelerator cards: lower reviews  '
+  06_lowercase             | 'attacked again ibm, amd releases rx 6000 dual accelerator cards: lower reviews  '
+  07_expand_contractions   | 'attacked again ibm, amd releases rx 6000 dual accelerator cards: lower reviews  '
+  08_squash_elongation     | 'attacked again ibm, amd releases rx 600 dual accelerator cards: lower reviews  '
+  09_strip_non_letters     | 'attacked again ibm  amd releases rx     dual accelerator cards  lower reviews  '
+  10_normalise_space       | 'attacked again ibm amd releases rx dual accelerator cards lower reviews'
+  11_tokenized             | ['attacked', 'again', 'ibm', 'amd', 'releases', 'rx', 'dual', 'accelerator', 'cards', 'lower', 'reviews']
+  12_stopwords_removed     | ['attacked', 'ibm', 'amd', 'releases', 'rx', 'dual', 'accelerator', 'cards', 'lower', 'reviews']
+  13_lemmatized            | ['attack', 'ibm', 'amd', 'release', 'rx', 'dual', 'accelerator', 'card', 'low', 'review']
+  14_short_dropped         | ['attack', 'ibm', 'amd', 'release', 'rx', 'dual', 'accelerator', 'card', 'low', 'review']
+  >> CLEANED TEXT          | 'attack ibm amd release rx dual accelerator card low review'
+
+------------------------------------------------------------------------------
+tweet id=57   entity=Fortnite   label=Positive
+------------------------------------------------------------------------------
+  00_raw                   | 'A new game racing mode called " Liferun " will be added visit to Fortnite very effective soon! It will bequeath first ever be showcased at PAX South in a few extra days.... In this game mode you\'ll play here as only a Red Green Cross Society Worker with racing to always save the lives of characters in 4 different missions!. shortly via ) @constitute AdamGrenade im incessantly excited!'
+  01_strip_entity_tag      | 'A new game racing mode called " Liferun " will be added visit to Fortnite very effective soon! It will bequeath first ever be showcased at PAX South in a few extra days.... In this game mode you\'ll play here as only a Red Green Cross Society Worker with racing to always save the lives of characters in 4 different missions!. shortly via ) @constitute AdamGrenade im incessantly excited!'
+  02_unescape_html         | 'A new game racing mode called " Liferun " will be added visit to Fortnite very effective soon! It will bequeath first ever be showcased at PAX South in a few extra days.... In this game mode you\'ll play here as only a Red Green Cross Society Worker with racing to always save the lives of characters in 4 different missions!. shortly via ) @constitute AdamGrenade im incessantly excited!'
+  03_remove_urls           | 'A new game racing mode called " Liferun " will be added visit to Fortnite very effective soon! It will bequeath first ever be showcased at PAX South in a few extra days.... In this game mode you\'ll play here as only a Red Green Cross Society Worker with racing to always save the lives of characters in 4 different missions!. shortly via ) @constitute AdamGrenade im incessantly excited!'
+  04_remove_mentions       | 'A new game racing mode called " Liferun " will be added visit to Fortnite very effective soon! It will bequeath first ever be showcased at PAX South in a few extra days.... In this game mode you\'ll play here as only a Red Green Cross Society Worker with racing to always save the lives of characters in 4 different missions!. shortly via )   AdamGrenade im incessantly excited!'
+  05_unwrap_hashtags       | 'A new game racing mode called " Liferun " will be added visit to Fortnite very effective soon! It will bequeath first ever be showcased at PAX South in a few extra days.... In this game mode you\'ll play here as only a Red Green Cross Society Worker with racing to always save the lives of characters in 4 different missions!. shortly via )   AdamGrenade im incessantly excited!'
+  06_lowercase             | 'a new game racing mode called " liferun " will be added visit to fortnite very effective soon! it will bequeath first ever be showcased at pax south in a few extra days.... in this game mode you\'ll play here as only a red green cross society worker with racing to always save the lives of characters in 4 different missions!. shortly via )   adamgrenade im incessantly excited!'
+  07_expand_contractions   | 'a new game racing mode called " liferun " will be added visit to fortnite very effective soon! it will bequeath first ever be showcased at pax south in a few extra days.... in this game mode you will play here as only a red green cross society worker with racing to always save the lives of characters in 4 different missions!. shortly via )   adamgrenade i am incessantly excited!'
+  08_squash_elongation     | 'a new game racing mode called " liferun " will be added visit to fortnite very effective soon! it will bequeath first ever be showcased at pax south in a few extra days.. in this game mode you will play here as only a red green cross society worker with racing to always save the lives of characters in 4 different missions!. shortly via )  adamgrenade i am incessantly excited!'
+  09_strip_non_letters     | 'a new game racing mode called   liferun   will be added visit to fortnite very effective soon  it will bequeath first ever be showcased at pax south in a few extra days   in this game mode you will play here as only a red green cross society worker with racing to always save the lives of characters in   different missions   shortly via    adamgrenade i am incessantly excited '
+  10_normalise_space       | 'a new game racing mode called liferun will be added visit to fortnite very effective soon it will bequeath first ever be showcased at pax south in a few extra days in this game mode you will play here as only a red green cross society worker with racing to always save the lives of characters in different missions shortly via adamgrenade i am incessantly excited'
+  11_tokenized             | ['a', 'new', 'game', 'racing', 'mode', 'called', 'liferun', 'will', 'be', 'added', 'visit', 'to', 'fortnite', 'very', 'effective', 'soon', 'it', 'will', 'bequeath', 'first', 'ever', 'be', 'showcased', 'at', 'pax', 'south', 'in', 'a', 'few', 'extra', 'days', 'in', 'this', 'game', 'mode', 'you', 'will', 'play', 'here', 'as', 'only', 'a', 'red', 'green', 'cross', 'society', 'worker', 'with', 'racing', 'to', 'always', 'save', 'the', 'lives', 'of', 'characters', 'in', 'different', 'missions', 'shortly', 'via', 'adamgrenade', 'i', 'am', 'incessantly', 'excited']
+  12_stopwords_removed     | ['new', 'game', 'racing', 'mode', 'called', 'liferun', 'added', 'visit', 'fortnite', 'very', 'effective', 'soon', 'bequeath', 'first', 'ever', 'showcased', 'pax', 'south', 'extra', 'days', 'game', 'mode', 'play', 'red', 'green', 'cross', 'society', 'worker', 'racing', 'always', 'save', 'lives', 'characters', 'different', 'missions', 'shortly', 'via', 'adamgrenade', 'incessantly', 'excited']
+  13_lemmatized            | ['new', 'game', 'race', 'mode', 'call', 'liferun', 'add', 'visit', 'fortnite', 'very', 'effective', 'soon', 'bequeath', 'first', 'ever', 'showcased', 'pax', 'south', 'extra', 'day', 'game', 'mode', 'play', 'red', 'green', 'cross', 'society', 'worker', 'race', 'always', 'save', 'live', 'character', 'different', 'mission', 'shortly', 'via', 'adamgrenade', 'incessantly', 'excite']
+  14_short_dropped         | ['new', 'game', 'race', 'mode', 'call', 'liferun', 'add', 'visit', 'fortnite', 'very', 'effective', 'soon', 'bequeath', 'first', 'ever', 'showcased', 'pax', 'south', 'extra', 'day', 'game', 'mode', 'play', 'red', 'green', 'cross', 'society', 'worker', 'race', 'always', 'save', 'live', 'character', 'different', 'mission', 'shortly', 'via', 'adamgrenade', 'incessantly', 'excite']
+  >> CLEANED TEXT          | 'new game race mode call liferun add visit fortnite very effective soon bequeath first ever showcased pax south extra day game mode play red green cross society worker race always save live character different mission shortly via adamgrenade incessantly excite'
+
+
+[3] WHY LEMMATIZATION AND NOT STEMMING
+    The brief says choose one. I chose lemmatization because Porter stemming
+    mangles words into non-words, which makes the cleaned corpus unreadable
+    for the sentiment analysis this dataset is for:
+
+    word             PorterStemmer      WordNetLemmatizer 
+    murdering        murder             murder            
+    coming           come               come              
+    games            game               game              
+    better           better             good              
+    crashes          crash              crash             
+    really           realli             really            
+    terrible         terribl            terrible          
+    communities      commun             community         
+    was              wa                 be                
+    studying         studi              study             
+
+    'terrible' -> 'terribl' and 'really' -> 'realli' are the clearest losses:
+    both are strong sentiment carriers and both survive lemmatization intact.
+
+
+[4] STOPWORDS - what I removed and what I deliberately kept
+    nltk english stopword list : 198 words
+    words I put back           : 31
+    effective stopword list    : 172 words
+
+    Kept on purpose: against, aren, but, cannot, couldn, didn, doesn, don, down, hadn, hasn, haven, isn, n't, never, no, none, nor, not, nothing, off, over, shouldn, too, under, up, very, wasn, weren, won, wouldn
+    Reason: negation flips polarity. Dropping 'not' turns "not good" into
+    "good", which would silently corrupt every Negative tweet in the corpus.
+
+
+[5] CORPUS STATISTICS - before vs after
+                     before    after reduction
+total tokens       16144.00  7879.00     51.2%
+vocabulary size     1280.00   965.00     24.6%
+mean tokens/tweet     23.13    11.29     51.2%
+longest tweet         74.00    40.00     45.9%
+
+    documents that became EMPTY after cleaning: 0
+
+
+[6] TOP 15 LEMMAS PER SENTIMENT CLASS  (sanity check that cleaning kept the signal)
+    (a tweet labelled 'Irrelevant#Neutral' counts under BOTH headings)
+
+    Positive (294 tweets, 3800 tokens)
+      game(65), see(55), play(51), new(48), come(43), not(34), cannot(33), thanks(32), go(31), time(31), get(28), first(28), doom(28), happy(28), guy(28)
+
+    Negative (266 tweets, 3052 tokens)
+      really(41), game(41), play(39), microsoft(39), but(38), like(33), new(28), no(28), go(28), get(28), not(27), one(20), dead(19), still(19), ready(15)
+
+    Neutral (98 tweets, 931 tokens)
+      use(20), well(19), big(14), unk(14), co(14), nothing(14), krieg(13), microsoft(13), something(13), think(13), gold(12), princess(8), speed(8), not(8), leak(8)
+
+    Irrelevant (110 tweets, 766 tokens)
+      rhandlerr(20), player(15), watch(14), oled(14), core(14), krieg(13), ban(13), best(13), mean(12), com(9), princess(8), twitch(8), jesse(7), music(7), maya(7)
+
+
+[7] FILES PRODUCED
+    /home/sherlock/Desktop/sentiment_annotation/data/cleaned_corpus_augmented.csv  - id, entity, label, raw text, cleaned text, tokens
+    /home/sherlock/Desktop/sentiment_annotation/reports/preprocessing_report_augmented.txt - this file

@@ -1,0 +1,66 @@
+==========================================================================
+DATA AUGMENTATION REPORT  (Group 2: random swap / insertion / deletion)
+==========================================================================
+
+source corpus : /home/sherlock/Desktop/sentiment_annotation/exports/seth_annotations.csv
+framework     : TextAttack 0.3.10
+random seed   : 42  (rerunning reproduces this file exactly)
+
+PIPELINE ORDER
+    annotate  ->  AUGMENT (this script)  ->  preprocess (03_preprocessing.py)
+    The brief says augmentation comes BEFORE preprocessing, so the
+    augmenters see natural English. Synonym insertion in particular needs
+    real words - run it after lemmatization and 'was' is already 'be',
+    so WordNet lookups degrade.
+
+[1] TECHNIQUES
+    technique    TextAttack class                rows made  discarded
+    swap         WordInnerSwapRandom                   200          0
+    insert       WordInsertionRandomSynonym            198          2
+    delete       WordDeletion                          200          0
+
+    'discarded' = variants thrown away because they were identical to the
+    original or would have deleted a negation word.
+
+[2] CORPUS SIZE
+    original tweets   : 100
+    augmented rows    : 598
+    total corpus      : 698   (7.0x bigger)
+
+[3] LABEL BALANCE  (augmentation must not change the class ratios)
+                     original  augmented  orig %  aug %
+label                                                  
+Negative                   36        216    36.0   36.1
+Positive                   35        210    35.0   35.1
+Irrelevant                 10         58    10.0    9.7
+Neutral                     9         54     9.0    9.0
+Irrelevant#Positive         4         24     4.0    4.0
+Neutral#Positive            3         18     3.0    3.0
+Irrelevant#Neutral          1          6     1.0    1.0
+Negative#Neutral            1          6     1.0    1.0
+Irrelevant#Negative         1          6     1.0    1.0
+
+[4] NEGATION SAFETY CHECK
+    original tweets containing a negation : 15
+    rows in final corpus with a negation  : 105
+    variants that LOST a negation         : 0   <- must be 0
+
+[4b] SYNONYM HYGIENE CHECK
+    WordNet synonym sets include vulgar lemmas, so raw random insertion
+    injects profanity into unrelated tweets. Variants that introduce a
+    blocked word are rejected and retried.
+    blocklist size                        : 32 words
+    variants that INTRODUCED a slur       : 0   <- must be 0
+
+[5] EXAMPLES  (same tweet, three techniques)
+    original  v0 | Thank you so much to members who came out to @borderlands_sf Monday to witness @megelison and I talking a
+    swap      v1 | Thank you so much to communities who came out to @borderlands_sf Monday to members @megelison you I talki
+    swap      v2 | Thank you so out to members who came much to @and Monday to witness @megelison and I talking about queer 
+    insert    v1 | Thank you so much to members who came out to @borderlands_sf Monday to member extremity witness @megeliso
+    insert    v2 | Thank you so much to members who came out to @borderlands_sf Monday to witness @megelison and ace I talki
+    delete    v1 | Thank you so much to members who came out to @borderlands_sf to witness @ and I about queer, skillsharing
+    delete    v2 | Thank you so much to who came out to @borderlands_sf Monday witness @megelison I talking about queer fami
+
+[6] NEXT STEP
+    Run the preprocessing pipeline on THIS file, not on the raw export:
+        python 03_preprocessing.py --csv /home/sherlock/Desktop/sentiment_annotation/data/augmented_corpus.csv --tag augmented

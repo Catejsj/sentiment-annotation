@@ -1,0 +1,163 @@
+==============================================================================
+TEXT PREPROCESSING REPORT  -  Twitter sentiment corpus (100 annotated tweets)
+source: /home/sherlock/Desktop/sentiment_annotation/data/doccano_export.csv (exported from Doccano)
+entities covered: 1
+==============================================================================
+
+[1] PIPELINE - the order matters
+
+    raw tweet
+      01 strip the [Entity] tag Doccano adds
+      02 unescape HTML entities        (&amp;  -> &)
+      03 remove URLs
+      04 remove @mentions
+      05 unwrap #hashtags              (#BoT   -> BoT)
+      06 lowercase
+      07 EXPAND CONTRACTIONS           (don't  -> do not)      <-- required
+      08 squash elongations            (soooo  -> soo)
+      09 remove emoji / digits / punctuation
+      10 normalise whitespace
+      11 WORD TOKENIZATION             (nltk TweetTokenizer)   <-- required
+      12 STOPWORDS REMOVAL             (nltk, negations kept)  <-- required
+      13 LEMMATIZATION                 (WordNet + POS tags)    <-- required
+      14 drop 1-character tokens
+
+    Two ordering decisions worth defending in the write-up:
+      * contraction expansion (07) MUST come before punctuation removal (09).
+        Reverse them and "don't" becomes "dont", which no expander recognises.
+      * lemmatization (13) comes after stopword removal (12) so we lemmatize
+        fewer tokens, and after lowercasing so WordNet lookups actually hit.
+
+[2] STAGE-BY-STAGE ON REAL TWEETS  (this is the 'cleaned text' view)
+
+------------------------------------------------------------------------------
+tweet id=7   entity=Borderlands   label=Positive
+------------------------------------------------------------------------------
+  00_raw                   | "[Borderlands] So I spent a few hours making something for fun. . . If you don't know I am a HUGE @Borderlands fan and Maya is one of my favorite characters. So I decided to make myself a wallpaper for my PC. . Here is the original image versus the creation I made :) Enjoy! pic.twitter.com/mLsI5wf9Jg"
+  01_strip_entity_tag      | "So I spent a few hours making something for fun. . . If you don't know I am a HUGE @Borderlands fan and Maya is one of my favorite characters. So I decided to make myself a wallpaper for my PC. . Here is the original image versus the creation I made :) Enjoy! pic.twitter.com/mLsI5wf9Jg"
+  02_unescape_html         | "So I spent a few hours making something for fun. . . If you don't know I am a HUGE @Borderlands fan and Maya is one of my favorite characters. So I decided to make myself a wallpaper for my PC. . Here is the original image versus the creation I made :) Enjoy! pic.twitter.com/mLsI5wf9Jg"
+  03_remove_urls           | "So I spent a few hours making something for fun. . . If you don't know I am a HUGE @Borderlands fan and Maya is one of my favorite characters. So I decided to make myself a wallpaper for my PC. . Here is the original image versus the creation I made :) Enjoy!  "
+  04_remove_mentions       | "So I spent a few hours making something for fun. . . If you don't know I am a HUGE   fan and Maya is one of my favorite characters. So I decided to make myself a wallpaper for my PC. . Here is the original image versus the creation I made :) Enjoy!  "
+  05_unwrap_hashtags       | "So I spent a few hours making something for fun. . . If you don't know I am a HUGE   fan and Maya is one of my favorite characters. So I decided to make myself a wallpaper for my PC. . Here is the original image versus the creation I made :) Enjoy!  "
+  06_lowercase             | "so i spent a few hours making something for fun. . . if you don't know i am a huge   fan and maya is one of my favorite characters. so i decided to make myself a wallpaper for my pc. . here is the original image versus the creation i made :) enjoy!  "
+  07_expand_contractions   | 'so i spent a few hours making something for fun. . . if you do not know i am a huge   fan and maya is one of my favorite characters. so i decided to make myself a wallpaper for my pc. . here is the original image versus the creation i made :) enjoy!  '
+  08_squash_elongation     | 'so i spent a few hours making something for fun. . . if you do not know i am a huge  fan and maya is one of my favorite characters. so i decided to make myself a wallpaper for my pc. . here is the original image versus the creation i made :) enjoy!  '
+  09_strip_non_letters     | 'so i spent a few hours making something for fun      if you do not know i am a huge  fan and maya is one of my favorite characters  so i decided to make myself a wallpaper for my pc    here is the original image versus the creation i made    enjoy   '
+  10_normalise_space       | 'so i spent a few hours making something for fun if you do not know i am a huge fan and maya is one of my favorite characters so i decided to make myself a wallpaper for my pc here is the original image versus the creation i made enjoy'
+  11_tokenized             | ['so', 'i', 'spent', 'a', 'few', 'hours', 'making', 'something', 'for', 'fun', 'if', 'you', 'do', 'not', 'know', 'i', 'am', 'a', 'huge', 'fan', 'and', 'maya', 'is', 'one', 'of', 'my', 'favorite', 'characters', 'so', 'i', 'decided', 'to', 'make', 'myself', 'a', 'wallpaper', 'for', 'my', 'pc', 'here', 'is', 'the', 'original', 'image', 'versus', 'the', 'creation', 'i', 'made', 'enjoy']
+  12_stopwords_removed     | ['spent', 'hours', 'making', 'something', 'fun', 'not', 'know', 'huge', 'fan', 'maya', 'one', 'favorite', 'characters', 'decided', 'make', 'wallpaper', 'pc', 'original', 'image', 'versus', 'creation', 'made', 'enjoy']
+  13_lemmatized            | ['spent', 'hour', 'make', 'something', 'fun', 'not', 'know', 'huge', 'fan', 'maya', 'one', 'favorite', 'character', 'decide', 'make', 'wallpaper', 'pc', 'original', 'image', 'versus', 'creation', 'make', 'enjoy']
+  14_short_dropped         | ['spent', 'hour', 'make', 'something', 'fun', 'not', 'know', 'huge', 'fan', 'maya', 'one', 'favorite', 'character', 'decide', 'make', 'wallpaper', 'pc', 'original', 'image', 'versus', 'creation', 'make', 'enjoy']
+  >> CLEANED TEXT          | 'spent hour make something fun not know huge fan maya one favorite character decide make wallpaper pc original image versus creation make enjoy'
+
+------------------------------------------------------------------------------
+tweet id=8   entity=Borderlands   label=Positive
+------------------------------------------------------------------------------
+  00_raw                   | "[Borderlands] So I spent a couple of hours doing something for fun... If you don't know that I'm a huge @ Borderlands fan and Maya is one of my favorite characters, I decided to make a wallpaper for my PC.. Here's the original picture compared to the creation I made:) Have fun! pic.twitter.com / mLsI5wf9Jg"
+  01_strip_entity_tag      | "So I spent a couple of hours doing something for fun... If you don't know that I'm a huge @ Borderlands fan and Maya is one of my favorite characters, I decided to make a wallpaper for my PC.. Here's the original picture compared to the creation I made:) Have fun! pic.twitter.com / mLsI5wf9Jg"
+  02_unescape_html         | "So I spent a couple of hours doing something for fun... If you don't know that I'm a huge @ Borderlands fan and Maya is one of my favorite characters, I decided to make a wallpaper for my PC.. Here's the original picture compared to the creation I made:) Have fun! pic.twitter.com / mLsI5wf9Jg"
+  03_remove_urls           | "So I spent a couple of hours doing something for fun... If you don't know that I'm a huge @ Borderlands fan and Maya is one of my favorite characters, I decided to make a wallpaper for my PC.. Here's the original picture compared to the creation I made:) Have fun!  "
+  04_remove_mentions       | "So I spent a couple of hours doing something for fun... If you don't know that I'm a huge   fan and Maya is one of my favorite characters, I decided to make a wallpaper for my PC.. Here's the original picture compared to the creation I made:) Have fun!  "
+  05_unwrap_hashtags       | "So I spent a couple of hours doing something for fun... If you don't know that I'm a huge   fan and Maya is one of my favorite characters, I decided to make a wallpaper for my PC.. Here's the original picture compared to the creation I made:) Have fun!  "
+  06_lowercase             | "so i spent a couple of hours doing something for fun... if you don't know that i'm a huge   fan and maya is one of my favorite characters, i decided to make a wallpaper for my pc.. here's the original picture compared to the creation i made:) have fun!  "
+  07_expand_contractions   | 'so i spent a couple of hours doing something for fun... if you do not know that i am a huge   fan and maya is one of my favorite characters, i decided to make a wallpaper for my pc.. here is the original picture compared to the creation i made:) have fun!  '
+  08_squash_elongation     | 'so i spent a couple of hours doing something for fun.. if you do not know that i am a huge  fan and maya is one of my favorite characters, i decided to make a wallpaper for my pc.. here is the original picture compared to the creation i made:) have fun!  '
+  09_strip_non_letters     | 'so i spent a couple of hours doing something for fun   if you do not know that i am a huge  fan and maya is one of my favorite characters  i decided to make a wallpaper for my pc   here is the original picture compared to the creation i made   have fun   '
+  10_normalise_space       | 'so i spent a couple of hours doing something for fun if you do not know that i am a huge fan and maya is one of my favorite characters i decided to make a wallpaper for my pc here is the original picture compared to the creation i made have fun'
+  11_tokenized             | ['so', 'i', 'spent', 'a', 'couple', 'of', 'hours', 'doing', 'something', 'for', 'fun', 'if', 'you', 'do', 'not', 'know', 'that', 'i', 'am', 'a', 'huge', 'fan', 'and', 'maya', 'is', 'one', 'of', 'my', 'favorite', 'characters', 'i', 'decided', 'to', 'make', 'a', 'wallpaper', 'for', 'my', 'pc', 'here', 'is', 'the', 'original', 'picture', 'compared', 'to', 'the', 'creation', 'i', 'made', 'have', 'fun']
+  12_stopwords_removed     | ['spent', 'couple', 'hours', 'something', 'fun', 'not', 'know', 'huge', 'fan', 'maya', 'one', 'favorite', 'characters', 'decided', 'make', 'wallpaper', 'pc', 'original', 'picture', 'compared', 'creation', 'made', 'fun']
+  13_lemmatized            | ['spent', 'couple', 'hour', 'something', 'fun', 'not', 'know', 'huge', 'fan', 'maya', 'one', 'favorite', 'character', 'decide', 'make', 'wallpaper', 'pc', 'original', 'picture', 'compare', 'creation', 'make', 'fun']
+  14_short_dropped         | ['spent', 'couple', 'hour', 'something', 'fun', 'not', 'know', 'huge', 'fan', 'maya', 'one', 'favorite', 'character', 'decide', 'make', 'wallpaper', 'pc', 'original', 'picture', 'compare', 'creation', 'make', 'fun']
+  >> CLEANED TEXT          | 'spent couple hour something fun not know huge fan maya one favorite character decide make wallpaper pc original picture compare creation make fun'
+
+------------------------------------------------------------------------------
+tweet id=35   entity=Borderlands   label=Positive
+------------------------------------------------------------------------------
+  00_raw                   | '[Borderlands] WE FINISHED BORDERLANDS 3 AND FINALLY YAS! Thank you everyone for hanging out everyone! It was fun. I will try to make stream tomorrow but if not I might make so some IRL streams while awayu. 10 We never shall see. Thank you both so... much for the raids @mompou_mumpow or @MegaMagwitch and 4 @KfdMitch.'
+  01_strip_entity_tag      | 'WE FINISHED BORDERLANDS 3 AND FINALLY YAS! Thank you everyone for hanging out everyone! It was fun. I will try to make stream tomorrow but if not I might make so some IRL streams while awayu. 10 We never shall see. Thank you both so... much for the raids @mompou_mumpow or @MegaMagwitch and 4 @KfdMitch.'
+  02_unescape_html         | 'WE FINISHED BORDERLANDS 3 AND FINALLY YAS! Thank you everyone for hanging out everyone! It was fun. I will try to make stream tomorrow but if not I might make so some IRL streams while awayu. 10 We never shall see. Thank you both so... much for the raids @mompou_mumpow or @MegaMagwitch and 4 @KfdMitch.'
+  03_remove_urls           | 'WE FINISHED BORDERLANDS 3 AND FINALLY YAS! Thank you everyone for hanging out everyone! It was fun. I will try to make stream tomorrow but if not I might make so some IRL streams while awayu. 10 We never shall see. Thank you both so... much for the raids @mompou_mumpow or @MegaMagwitch and 4 @KfdMitch.'
+  04_remove_mentions       | 'WE FINISHED BORDERLANDS 3 AND FINALLY YAS! Thank you everyone for hanging out everyone! It was fun. I will try to make stream tomorrow but if not I might make so some IRL streams while awayu. 10 We never shall see. Thank you both so... much for the raids   or   and 4  .'
+  05_unwrap_hashtags       | 'WE FINISHED BORDERLANDS 3 AND FINALLY YAS! Thank you everyone for hanging out everyone! It was fun. I will try to make stream tomorrow but if not I might make so some IRL streams while awayu. 10 We never shall see. Thank you both so... much for the raids   or   and 4  .'
+  06_lowercase             | 'we finished borderlands 3 and finally yas! thank you everyone for hanging out everyone! it was fun. i will try to make stream tomorrow but if not i might make so some irl streams while awayu. 10 we never shall see. thank you both so... much for the raids   or   and 4  .'
+  07_expand_contractions   | 'we finished borderlands 3 and finally yas! thank you everyone for hanging out everyone! it was fun. i will try to make stream tomorrow but if not i might make so some irl streams while awayu. 10 we never shall see. thank you both so... much for the raids   or   and 4  .'
+  08_squash_elongation     | 'we finished borderlands 3 and finally yas! thank you everyone for hanging out everyone! it was fun. i will try to make stream tomorrow but if not i might make so some irl streams while awayu. 10 we never shall see. thank you both so.. much for the raids  or  and 4  .'
+  09_strip_non_letters     | 'we finished borderlands   and finally yas  thank you everyone for hanging out everyone  it was fun  i will try to make stream tomorrow but if not i might make so some irl streams while awayu     we never shall see  thank you both so   much for the raids  or  and     '
+  10_normalise_space       | 'we finished borderlands and finally yas thank you everyone for hanging out everyone it was fun i will try to make stream tomorrow but if not i might make so some irl streams while awayu we never shall see thank you both so much for the raids or and'
+  11_tokenized             | ['we', 'finished', 'borderlands', 'and', 'finally', 'yas', 'thank', 'you', 'everyone', 'for', 'hanging', 'out', 'everyone', 'it', 'was', 'fun', 'i', 'will', 'try', 'to', 'make', 'stream', 'tomorrow', 'but', 'if', 'not', 'i', 'might', 'make', 'so', 'some', 'irl', 'streams', 'while', 'awayu', 'we', 'never', 'shall', 'see', 'thank', 'you', 'both', 'so', 'much', 'for', 'the', 'raids', 'or', 'and']
+  12_stopwords_removed     | ['finished', 'borderlands', 'finally', 'yas', 'thank', 'everyone', 'hanging', 'everyone', 'fun', 'try', 'make', 'stream', 'tomorrow', 'but', 'not', 'might', 'make', 'irl', 'streams', 'awayu', 'never', 'shall', 'see', 'thank', 'much', 'raids']
+  13_lemmatized            | ['finish', 'borderland', 'finally', 'yas', 'thank', 'everyone', 'hang', 'everyone', 'fun', 'try', 'make', 'stream', 'tomorrow', 'but', 'not', 'might', 'make', 'irl', 'stream', 'awayu', 'never', 'shall', 'see', 'thank', 'much', 'raid']
+  14_short_dropped         | ['finish', 'borderland', 'finally', 'yas', 'thank', 'everyone', 'hang', 'everyone', 'fun', 'try', 'make', 'stream', 'tomorrow', 'but', 'not', 'might', 'make', 'irl', 'stream', 'awayu', 'never', 'shall', 'see', 'thank', 'much', 'raid']
+  >> CLEANED TEXT          | 'finish borderland finally yas thank everyone hang everyone fun try make stream tomorrow but not might make irl stream awayu never shall see thank much raid'
+
+
+[3] WHY LEMMATIZATION AND NOT STEMMING
+    The brief says choose one. I chose lemmatization because Porter stemming
+    mangles words into non-words, which makes the cleaned corpus unreadable
+    for the sentiment analysis this dataset is for:
+
+    word             PorterStemmer      WordNetLemmatizer 
+    murdering        murder             murder            
+    coming           come               come              
+    games            game               game              
+    better           better             good              
+    crashes          crash              crash             
+    really           realli             really            
+    terrible         terribl            terrible          
+    communities      commun             community         
+    was              wa                 be                
+    studying         studi              study             
+
+    'terrible' -> 'terribl' and 'really' -> 'realli' are the clearest losses:
+    both are strong sentiment carriers and both survive lemmatization intact.
+
+
+[4] STOPWORDS - what I removed and what I deliberately kept
+    nltk english stopword list : 198 words
+    words I put back           : 31
+    effective stopword list    : 172 words
+
+    Kept on purpose: against, aren, but, cannot, couldn, didn, doesn, don, down, hadn, hasn, haven, isn, n't, never, no, none, nor, not, nothing, off, over, shouldn, too, under, up, very, wasn, weren, won, wouldn
+    Reason: negation flips polarity. Dropping 'not' turns "not good" into
+    "good", which would silently corrupt every Negative tweet in the corpus.
+
+
+[5] CORPUS STATISTICS - before vs after
+                    before    after reduction
+total tokens       2876.00  1232.00     57.2%
+vocabulary size     435.00   266.00     38.9%
+mean tokens/tweet    28.76    12.32     57.2%
+longest tweet        65.00    32.00     50.8%
+
+    documents that became EMPTY after cleaning: 8
+    (these were punctuation-only or stopword-only tweets - exactly the ones
+     the annotators disagreed most about in step 2)
+      id=12   label=Irrelevant raw='[Borderlands] was'
+      id=54   label=Irrelevant raw='[Borderlands] all'
+      id=61   label=Irrelevant raw='[Borderlands]  . . ['
+      id=62   label=Irrelevant raw='[Borderlands]'
+      id=63   label=Irrelevant raw='[Borderlands] .. ['
+      id=64   label=Irrelevant raw='[Borderlands] .. 45'
+      id=65   label=Irrelevant raw='[Borderlands] .. ['
+      id=66   label=Irrelevant raw='[Borderlands] .. what'
+
+
+[6] TOP 15 LEMMAS PER SENTIMENT CLASS  (sanity check that cleaning kept the signal)
+    (a tweet labelled 'Irrelevant#Neutral' counts under BOTH headings)
+
+    Positive (46 tweets, 511 tokens)
+      borderland(20), fun(18), get(15), stream(15), make(14), go(13), good(12), not(11), really(11), finish(11), hour(10), thank(10), up(10), kill(8), first(6)
+
+    Negative (22 tweets, 344 tokens)
+      drop(18), really(15), borderland(12), get(12), man(10), cannot(8), big(6), life(6), come(6), year(6), ago(6), fix(6), new(6), boss(6), mayhem(6)
+
+    Neutral (18 tweets, 301 tokens)
+      modifier(17), shout(13), mayhem(12), catch(8), one(7), live(6), say(6), chat(6), chance(6), hate(6), event(6), last(6), forever(6), fun(6), game(6)
+
+    Irrelevant (14 tweets, 76 tokens)
+      hard(6), la(6), rare(6), handsome(6), xbox(6), rmtrgf(6), rock(5), powerful(5), jackpot(5), borderlands(5), dlvr(5), varlope(4), live(2), dfr(1), vita(1)
+
+
+[7] FILES PRODUCED
+    /home/sherlock/Desktop/sentiment_annotation/data/cleaned_corpus.csv  - id, entity, label, raw text, cleaned text, tokens
+    /home/sherlock/Desktop/sentiment_annotation/reports/preprocessing_report.txt - this file
