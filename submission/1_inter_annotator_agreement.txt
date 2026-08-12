@@ -1,5 +1,5 @@
 ==============================================================================
-INTER-ANNOTATOR AGREEMENT  -  5 annotators
+INTER-ANNOTATOR AGREEMENT  -  6 annotators
 Cohen's Kappa (scikit-learn) + Fleiss' Kappa (statsmodels)
 ==============================================================================
 
@@ -9,47 +9,60 @@ files:
     Nacc_annotated_tweets exports/team/Nacc_annotated_tweets.csv   (100 rows)
     Nita_annotated_tweets exports/team/Nita_annotated_tweets.csv   (100 rows)
     Reaksa_annotation    exports/team/Reaksa_annotation.csv   (100 rows)
+    Sambath_annotated_tweets exports/team/Sambath_annotated_tweets.csv   (100 rows)
 
 [1] ALIGNMENT CHECK
     join key : 'id' (100 shared ids, text verified consistent)
     documents present in every file : 100
     ok  every shared id carries identical text in every file
 
+    [!] these files have IDENTICAL primary labels on all documents:
+          krisna annotated_tweets  ==  Sambath_annotated_tweets    (differ only in second labels on 7 rows)
+        Two independent annotators do not produce identical labels on
+        100 tweets. Treat these as ONE rater: a duplicate scores kappa
+        1.000 against itself and inflates the whole group's agreement.
+
 
 [2] LABEL DISTRIBUTION (primary label)
-            annotated_tweets  krisna annotated_tweets  Nacc_annotated_tweets  Nita_annotated_tweets  Reaksa_annotation
-Positive                  35                       37                     45                     38                 27
-Negative                  37                       37                     24                     37                 29
-Neutral                   12                       12                      7                     10                 30
-Irrelevant                16                       14                     24                     15                 14
+            annotated_tweets  krisna annotated_tweets  Nacc_annotated_tweets  Nita_annotated_tweets  Reaksa_annotation  Sambath_annotated_tweets
+Positive                  35                       37                     45                     38                 27                        37
+Negative                  37                       37                     24                     37                 29                        37
+Neutral                   12                       12                      7                     10                 30                        12
+Irrelevant                16                       14                     24                     15                 14                        14
 
 
 [3] PAIRWISE COHEN'S KAPPA  (primary label)
-                         annotated_tweets  krisna annotated_tweets  Nacc_annotated_tweets  Nita_annotated_tweets  Reaksa_annotation
-annotated_tweets                    1.000                    0.483                  0.349                  0.481              0.351
-krisna annotated_tweets             0.483                    1.000                  0.473                  0.826              0.403
-Nacc_annotated_tweets               0.349                    0.473                  1.000                  0.469              0.152
-Nita_annotated_tweets               0.481                    0.826                  0.469                  1.000              0.351
-Reaksa_annotation                   0.351                    0.403                  0.152                  0.351              1.000
+                          annotated_tweets  krisna annotated_tweets  Nacc_annotated_tweets  Nita_annotated_tweets  Reaksa_annotation  Sambath_annotated_tweets
+annotated_tweets                     1.000                    0.483                  0.349                  0.481              0.351                     0.483
+krisna annotated_tweets              0.483                    1.000                  0.473                  0.826              0.403                     1.000
+Nacc_annotated_tweets                0.349                    0.473                  1.000                  0.469              0.152                     0.473
+Nita_annotated_tweets                0.481                    0.826                  0.469                  1.000              0.351                     0.826
+Reaksa_annotation                    0.351                    0.403                  0.152                  0.351              1.000                     0.403
+Sambath_annotated_tweets             0.483                    1.000                  0.473                  0.826              0.403                     1.000
 
     pair-by-pair, with raw agreement for context:
+      krisna annotated_tweets vs Sambath_annotated_tweets kappa= 1.000  raw=100.0%  almost perfect
       krisna annotated_tweets vs Nita_annotated_tweets kappa= 0.826  raw=88.0%  almost perfect
+      Nita_annotated_tweets vs Sambath_annotated_tweets kappa= 0.826  raw=88.0%  almost perfect
       annotated_tweets vs krisna annotated_tweets kappa= 0.483  raw=64.0%  moderate
+      annotated_tweets vs Sambath_annotated_tweets kappa= 0.483  raw=64.0%  moderate
       annotated_tweets vs Nita_annotated_tweets kappa= 0.481  raw=64.0%  moderate
       krisna annotated_tweets vs Nacc_annotated_tweets kappa= 0.473  raw=63.0%  moderate
+      Nacc_annotated_tweets vs Sambath_annotated_tweets kappa= 0.473  raw=63.0%  moderate
       Nacc_annotated_tweets vs Nita_annotated_tweets kappa= 0.469  raw=63.0%  moderate
       krisna annotated_tweets vs Reaksa_annotation kappa= 0.403  raw=56.0%  fair
+      Reaksa_annotation vs Sambath_annotated_tweets kappa= 0.403  raw=56.0%  fair
       annotated_tweets vs Reaksa_annotation kappa= 0.351  raw=52.0%  fair
       Nita_annotated_tweets vs Reaksa_annotation kappa= 0.351  raw=52.0%  fair
       annotated_tweets vs Nacc_annotated_tweets kappa= 0.349  raw=54.0%  fair
       Nacc_annotated_tweets vs Reaksa_annotation kappa= 0.152  raw=36.0%  slight
 
-    mean pairwise kappa : 0.434  (moderate)
+    mean pairwise kappa : 0.502  (moderate)
 
 
-[4] FLEISS' KAPPA  (all 5 annotators at once)
+[4] FLEISS' KAPPA  (all 6 annotators at once)
     categories : ['Irrelevant', 'Negative', 'Neutral', 'Positive']
-    Fleiss' kappa : 0.427  (moderate)
+    Fleiss' kappa : 0.495  (moderate)
     Use this as the single headline number for the whole group.
 
 
@@ -59,19 +72,24 @@ Reaksa_annotation                   0.351                    0.403              
       annotated_tweets vs Nacc_annotated_tweets  51.0%
       annotated_tweets vs Nita_annotated_tweets  62.0%
       annotated_tweets vs Reaksa_annotation  50.0%
+      annotated_tweets vs Sambath_annotated_tweets  61.0%
       krisna annotated_tweets vs Nacc_annotated_tweets  63.0%
       krisna annotated_tweets vs Nita_annotated_tweets  87.0%
       krisna annotated_tweets vs Reaksa_annotation  52.0%
+      krisna annotated_tweets vs Sambath_annotated_tweets  93.0%
       Nacc_annotated_tweets vs Nita_annotated_tweets  63.0%
       Nacc_annotated_tweets vs Reaksa_annotation  36.0%
+      Nacc_annotated_tweets vs Sambath_annotated_tweets  63.0%
       Nita_annotated_tweets vs Reaksa_annotation  51.0%
+      Nita_annotated_tweets vs Sambath_annotated_tweets  84.0%
+      Reaksa_annotation vs Sambath_annotated_tweets  56.0%
 
     per-label Cohen's kappa - 'did we both apply this label?'
       label            mean kappa   interpretation
-      Positive              0.591   moderate
-      Negative              0.533   moderate
-      Neutral               0.102   slight
-      Irrelevant            0.286   fair
+      Positive              0.632   substantial
+      Negative              0.591   moderate
+      Neutral               0.189   slight
+      Irrelevant            0.364   fair
 
 
 [6] WHERE WE DISAGREE
@@ -80,36 +98,36 @@ Reaksa_annotation                   0.351                    0.403              
     no majority          :   0
 
     10 most contested tweets:
-      id=36  [2/5 agree]
+      id=36  [3/6 agree]
         with i mean this is just insane . . . rhandlerr rhandlerr rhandlerr pic.twitter.com/30llzt6egr
-        annotated_tweets=Irrelevant, krisna annotated_tweets=Negative, Nacc_annotated_tweets=Irrelevant, Nita_annotated_tweets=Negative, Reaksa_annotation=Neutral
-      id=39  [2/5 agree]
+        annotated_tweets=Irrelevant, krisna annotated_tweets=Negative, Nacc_annotated_tweets=Irrelevant, Nita_annotated_tweets=Negative, Reaksa_annotation=Neutral, Sambath_annotated_tweets=Negative
+      id=39  [3/6 agree]
         hey @ verizonfios @ verizonsupport why does my internet speed drop to 591 mbit / s when i pay fo
-        annotated_tweets=Neutral, krisna annotated_tweets=Irrelevant, Nacc_annotated_tweets=Negative, Nita_annotated_tweets=Irrelevant, Reaksa_annotation=Neutral
-      id=43  [2/5 agree]
+        annotated_tweets=Neutral, krisna annotated_tweets=Irrelevant, Nacc_annotated_tweets=Negative, Nita_annotated_tweets=Irrelevant, Reaksa_annotation=Neutral, Sambath_annotated_tweets=Irrelevant
+      id=43  [3/6 agree]
         csgo pls stop ranking me up games are getting harder huhu
-        annotated_tweets=Positive, krisna annotated_tweets=Neutral, Nacc_annotated_tweets=Positive, Nita_annotated_tweets=Neutral, Reaksa_annotation=Negative
-      id=44  [2/5 agree]
+        annotated_tweets=Positive, krisna annotated_tweets=Neutral, Nacc_annotated_tweets=Positive, Nita_annotated_tweets=Neutral, Reaksa_annotation=Negative, Sambath_annotated_tweets=Neutral
+      id=44  [3/6 agree]
         google and amazon were the biggest imitators of the brands used in phishing attacks in the june 
-        annotated_tweets=Negative, krisna annotated_tweets=Irrelevant, Nacc_annotated_tweets=Neutral, Nita_annotated_tweets=Irrelevant, Reaksa_annotation=Positive
-      id=51  [2/5 agree]
+        annotated_tweets=Negative, krisna annotated_tweets=Irrelevant, Nacc_annotated_tweets=Neutral, Nita_annotated_tweets=Irrelevant, Reaksa_annotation=Positive, Sambath_annotated_tweets=Irrelevant
+      id=51  [3/6 agree]
         not exactly. free means the price is your data. during the early days of avast and avg, i used t
-        annotated_tweets=Neutral, krisna annotated_tweets=Negative, Nacc_annotated_tweets=Irrelevant, Nita_annotated_tweets=Negative, Reaksa_annotation=Neutral
-      id=55  [2/5 agree]
+        annotated_tweets=Neutral, krisna annotated_tweets=Negative, Nacc_annotated_tweets=Irrelevant, Nita_annotated_tweets=Negative, Reaksa_annotation=Neutral, Sambath_annotated_tweets=Negative
+      id=53  [3/6 agree]
+        @ yoyaltygaming i can't see them.
+        annotated_tweets=Irrelevant, krisna annotated_tweets=Negative, Nacc_annotated_tweets=Irrelevant, Nita_annotated_tweets=Negative, Reaksa_annotation=Irrelevant, Sambath_annotated_tweets=Negative
+      id=55  [3/6 agree]
         than $500 on the aero va oled - award winning design, stunning 4k oled panel, color in front edg
-        annotated_tweets=Irrelevant, krisna annotated_tweets=Positive, Nacc_annotated_tweets=Neutral, Nita_annotated_tweets=Positive, Reaksa_annotation=Neutral
-      id=65  [2/5 agree]
+        annotated_tweets=Irrelevant, krisna annotated_tweets=Positive, Nacc_annotated_tweets=Neutral, Nita_annotated_tweets=Positive, Reaksa_annotation=Neutral, Sambath_annotated_tweets=Positive
+      id=65  [3/6 agree]
         @saquon you peep with ball carrier vision? they hurt 🤦. ‍.
-        annotated_tweets=Negative, krisna annotated_tweets=Neutral, Nacc_annotated_tweets=Irrelevant, Nita_annotated_tweets=Negative, Reaksa_annotation=Neutral
-      id=77  [2/5 agree]
+        annotated_tweets=Negative, krisna annotated_tweets=Neutral, Nacc_annotated_tweets=Irrelevant, Nita_annotated_tweets=Negative, Reaksa_annotation=Neutral, Sambath_annotated_tweets=Neutral
+      id=77  [3/6 agree]
         it is not the first time that the eu commission has taken such a step.
-        annotated_tweets=Positive, krisna annotated_tweets=Neutral, Nacc_annotated_tweets=Positive, Nita_annotated_tweets=Irrelevant, Reaksa_annotation=Neutral
-      id=79  [2/5 agree]
+        annotated_tweets=Positive, krisna annotated_tweets=Neutral, Nacc_annotated_tweets=Positive, Nita_annotated_tweets=Irrelevant, Reaksa_annotation=Neutral, Sambath_annotated_tweets=Neutral
+      id=79  [3/6 agree]
         "and so it this a symptom of something bigger rolling on? so is it a cause? so now's where every
-        annotated_tweets=Neutral, krisna annotated_tweets=Irrelevant, Nacc_annotated_tweets=Irrelevant, Nita_annotated_tweets=Neutral, Reaksa_annotation=Negative
-      id=87  [2/5 agree]
-        i absolutely got the new
-        annotated_tweets=Irrelevant, krisna annotated_tweets=Neutral, Nacc_annotated_tweets=Positive, Nita_annotated_tweets=Positive, Reaksa_annotation=Neutral
+        annotated_tweets=Neutral, krisna annotated_tweets=Irrelevant, Nacc_annotated_tweets=Irrelevant, Nita_annotated_tweets=Neutral, Reaksa_annotation=Negative, Sambath_annotated_tweets=Irrelevant
 
 
 [7] READING THESE NUMBERS

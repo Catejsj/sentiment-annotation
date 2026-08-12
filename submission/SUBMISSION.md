@@ -55,12 +55,12 @@ Full detail in `2_augmentation_report.txt`.
 
 ### 1. Inter-annotator agreement
 
-5 annotators over the same 100 tweets.
+6 annotators over the same 100 tweets.
 
 | Metric | Value | Interpretation |
 |---|---|---|
-| **Fleiss' kappa** | **0.427** | moderate |
-| Mean pairwise Cohen's kappa | 0.434 | moderate |
+| **Fleiss' kappa** | **0.495** | moderate |
+| Mean pairwise Cohen's kappa | 0.502 | moderate |
 | Strongest pair | 0.826 | almost perfect |
 | Weakest pair | 0.152 | slight |
 

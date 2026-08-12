@@ -16,7 +16,7 @@ PIPELINE ORDER
 [1] TECHNIQUES
     technique    TextAttack class                rows made  discarded
     swap         WordInnerSwapRandom                   200          0
-    insert       WordInsertionRandomSynonym            198          2
+    insert       WordInsertionRandomSynonym            199          1
     delete       WordDeletion                          200          0
 
     'discarded' = variants thrown away because they were identical to the
@@ -24,15 +24,15 @@ PIPELINE ORDER
 
 [2] CORPUS SIZE
     original tweets   : 100
-    augmented rows    : 598
-    total corpus      : 698   (7.0x bigger)
+    augmented rows    : 599
+    total corpus      : 699   (7.0x bigger)
 
 [3] LABEL BALANCE  (augmentation must not change the class ratios)
                      original  augmented  orig %  aug %
 label                                                  
 Negative                   36        216    36.0   36.1
 Positive                   35        210    35.0   35.1
-Irrelevant                 10         58    10.0    9.7
+Irrelevant                 10         59    10.0    9.8
 Neutral                     9         54     9.0    9.0
 Irrelevant#Positive         4         24     4.0    4.0
 Neutral#Positive            3         18     3.0    3.0
@@ -56,8 +56,8 @@ Irrelevant#Negative         1          6     1.0    1.0
     original  v0 | Thank you so much to members who came out to @borderlands_sf Monday to witness @megelison and I talking a
     swap      v1 | Thank you so much to communities who came out to @borderlands_sf Monday to members @megelison you I talki
     swap      v2 | Thank you so out to members who came much to @and Monday to witness @megelison and I talking about queer 
-    insert    v1 | Thank you so much to members who came out to @borderlands_sf Monday to member appendage witness @megeliso
-    insert    v2 | Thank you so much to members who came out to @borderlands_sf Monday to witness @megelison and single I ta
+    insert    v1 | Thank you so much to members who came out to @borderlands_sf Monday to appendage phallus witness @megelis
+    insert    v2 | Thank you so much to members who came out to @borderlands_sf Monday to witness @megelison and ane I talki
     delete    v1 | Thank you so much to members who came out to @borderlands_sf to witness @ and I about queer, skillsharing
     delete    v2 | Thank you so much to who came out to @borderlands_sf Monday witness @megelison I talking about queer fami
 
