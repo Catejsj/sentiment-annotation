@@ -13,7 +13,7 @@ Pipeline order, as instructed: **annotate → augment → preprocess.**
 | # | Required | File | Status |
 |---|---|---|---|
 | 1 | Your annotation | `1_my_annotation.csv` | 100 tweets, all labelled |
-| 1 | Your inter-annotator agreements | `1_inter_annotator_agreement.txt` | Cohen's + Fleiss' kappa, 5 annotators |
+| 1 | Your inter-annotator agreements | `1_inter_annotator_agreement.txt` | Cohen's + Fleiss' kappa, 6 files incl. mine |
 | 2 | Your augmented dataset (**added to the original**) | `2_augmented_dataset.csv` | 699 rows = 100 original + 599 augmented |
 | 3 | Your cleaned dataset after preprocessing | `3_cleaned_dataset.csv` | 699 rows preprocessed |
 
@@ -55,14 +55,23 @@ Full detail in `2_augmentation_report.txt`.
 
 ### 1. Inter-annotator agreement
 
-5 genuine annotators over the same 100 tweets (see note below).
+6 annotation files over the same 100 tweets, **including my own** (listed first
+in the report as `seth`). Inter-annotator agreement compares my labels against
+each teammate's, so my annotation is one of the raters, not a separate baseline.
 
-| Metric | Value | Interpretation |
+| Raters counted | Fleiss' kappa | Mean pairwise Cohen's kappa |
 |---|---|---|
-| **Fleiss' kappa** | **0.427** | moderate |
-| Mean pairwise Cohen's kappa | 0.434 | moderate |
-| Strongest pair | 0.826 | almost perfect |
-| Weakest pair | 0.152 | slight |
+| All 6 files as submitted | 0.495 | 0.502 |
+| **5, treating the identical pair as one rater** | **0.427** | **0.434** |
+
+`1_inter_annotator_agreement.txt` is the 6-file run, so the reader can see every
+teammate's numbers. The 5-rater figure is the one we consider valid — see the
+note below.
+
+| | Value |
+|---|---|
+| Strongest pair | 0.826 (almost perfect) |
+| Weakest pair | 0.152 (slight) |
 
 The disagreement is concentrated in the **Neutral** class. One annotator used
 Neutral 30 times; the rest used it 7–12 times. A second leaned Positive (45)
@@ -73,15 +82,9 @@ accounts for most of the lost agreement.
 **Note on rater count.** Six files were submitted, but two of them carry
 identical primary labels on all 100 tweets, differing only in second labels on
 7 rows. That pair scores kappa 1.000 against each other, which pulls the group
-average up. Both figures are reported for transparency:
-
-| Raters counted | Fleiss' kappa | Mean pairwise Cohen's kappa |
-|---|---|---|
-| All 6 files as submitted | 0.495 | 0.502 |
-| 5, treating the identical pair as one rater | **0.427** | **0.434** |
-
-The 5-rater figure is the honest one, since two independent annotators do not
-produce identical labels on 100 tweets.
+average up. Two independent annotators do not produce identical labels on 100
+tweets, so the 5-rater figure is the honest one. Both are reported above rather
+than quietly picking the higher number.
 
 ### 2. Augmented dataset
 
@@ -132,5 +135,5 @@ become `borderland` and lose its link to the entity column.
 ```bash
 python scripts/augment.py
 python scripts/preprocess.py --csv data/augmented/tweets_augmented.csv --tag augmented
-python scripts/score.py data/raw/annotated_tweets.csv exports/team/*.csv
+python scripts/score.py exports/seth_annotations.csv exports/team/*.csv
 ```

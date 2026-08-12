@@ -4,7 +4,7 @@ Cohen's Kappa (scikit-learn) + Fleiss' Kappa (statsmodels)
 ==============================================================================
 
 files:
-    annotated_tweets     data/raw/annotated_tweets.csv   (100 rows)
+    seth                 exports/seth_annotations.csv   (100 rows)
     krisna annotated_tweets exports/team/krisna annotated_tweets.csv   (100 rows)
     Nacc_annotated_tweets exports/team/Nacc_annotated_tweets.csv   (100 rows)
     Nita_annotated_tweets exports/team/Nita_annotated_tweets.csv   (100 rows)
@@ -24,37 +24,37 @@ files:
 
 
 [2] LABEL DISTRIBUTION (primary label)
-            annotated_tweets  krisna annotated_tweets  Nacc_annotated_tweets  Nita_annotated_tweets  Reaksa_annotation  Sambath_annotated_tweets
-Positive                  35                       37                     45                     38                 27                        37
-Negative                  37                       37                     24                     37                 29                        37
-Neutral                   12                       12                      7                     10                 30                        12
-Irrelevant                16                       14                     24                     15                 14                        14
+            seth  krisna annotated_tweets  Nacc_annotated_tweets  Nita_annotated_tweets  Reaksa_annotation  Sambath_annotated_tweets
+Positive      35                       37                     45                     38                 27                        37
+Negative      37                       37                     24                     37                 29                        37
+Neutral       12                       12                      7                     10                 30                        12
+Irrelevant    16                       14                     24                     15                 14                        14
 
 
 [3] PAIRWISE COHEN'S KAPPA  (primary label)
-                          annotated_tweets  krisna annotated_tweets  Nacc_annotated_tweets  Nita_annotated_tweets  Reaksa_annotation  Sambath_annotated_tweets
-annotated_tweets                     1.000                    0.483                  0.349                  0.481              0.351                     0.483
-krisna annotated_tweets              0.483                    1.000                  0.473                  0.826              0.403                     1.000
-Nacc_annotated_tweets                0.349                    0.473                  1.000                  0.469              0.152                     0.473
-Nita_annotated_tweets                0.481                    0.826                  0.469                  1.000              0.351                     0.826
-Reaksa_annotation                    0.351                    0.403                  0.152                  0.351              1.000                     0.403
-Sambath_annotated_tweets             0.483                    1.000                  0.473                  0.826              0.403                     1.000
+                           seth  krisna annotated_tweets  Nacc_annotated_tweets  Nita_annotated_tweets  Reaksa_annotation  Sambath_annotated_tweets
+seth                      1.000                    0.483                  0.349                  0.481              0.351                     0.483
+krisna annotated_tweets   0.483                    1.000                  0.473                  0.826              0.403                     1.000
+Nacc_annotated_tweets     0.349                    0.473                  1.000                  0.469              0.152                     0.473
+Nita_annotated_tweets     0.481                    0.826                  0.469                  1.000              0.351                     0.826
+Reaksa_annotation         0.351                    0.403                  0.152                  0.351              1.000                     0.403
+Sambath_annotated_tweets  0.483                    1.000                  0.473                  0.826              0.403                     1.000
 
     pair-by-pair, with raw agreement for context:
       krisna annotated_tweets vs Sambath_annotated_tweets kappa= 1.000  raw=100.0%  almost perfect
       krisna annotated_tweets vs Nita_annotated_tweets kappa= 0.826  raw=88.0%  almost perfect
       Nita_annotated_tweets vs Sambath_annotated_tweets kappa= 0.826  raw=88.0%  almost perfect
-      annotated_tweets vs krisna annotated_tweets kappa= 0.483  raw=64.0%  moderate
-      annotated_tweets vs Sambath_annotated_tweets kappa= 0.483  raw=64.0%  moderate
-      annotated_tweets vs Nita_annotated_tweets kappa= 0.481  raw=64.0%  moderate
+      seth           vs krisna annotated_tweets kappa= 0.483  raw=64.0%  moderate
+      seth           vs Sambath_annotated_tweets kappa= 0.483  raw=64.0%  moderate
+      seth           vs Nita_annotated_tweets kappa= 0.481  raw=64.0%  moderate
       krisna annotated_tweets vs Nacc_annotated_tweets kappa= 0.473  raw=63.0%  moderate
       Nacc_annotated_tweets vs Sambath_annotated_tweets kappa= 0.473  raw=63.0%  moderate
       Nacc_annotated_tweets vs Nita_annotated_tweets kappa= 0.469  raw=63.0%  moderate
       krisna annotated_tweets vs Reaksa_annotation kappa= 0.403  raw=56.0%  fair
       Reaksa_annotation vs Sambath_annotated_tweets kappa= 0.403  raw=56.0%  fair
-      annotated_tweets vs Reaksa_annotation kappa= 0.351  raw=52.0%  fair
+      seth           vs Reaksa_annotation kappa= 0.351  raw=52.0%  fair
       Nita_annotated_tweets vs Reaksa_annotation kappa= 0.351  raw=52.0%  fair
-      annotated_tweets vs Nacc_annotated_tweets kappa= 0.349  raw=54.0%  fair
+      seth           vs Nacc_annotated_tweets kappa= 0.349  raw=54.0%  fair
       Nacc_annotated_tweets vs Reaksa_annotation kappa= 0.152  raw=36.0%  slight
 
     mean pairwise kappa : 0.502  (moderate)
@@ -68,11 +68,11 @@ Sambath_annotated_tweets             0.483                    1.000             
 
 [5] MULTI-LABEL VIEWS  (because we allow two labels per tweet)
     exact-match agreement - both annotators picked the identical label SET:
-      annotated_tweets vs krisna annotated_tweets  62.0%
-      annotated_tweets vs Nacc_annotated_tweets  51.0%
-      annotated_tweets vs Nita_annotated_tweets  62.0%
-      annotated_tweets vs Reaksa_annotation  50.0%
-      annotated_tweets vs Sambath_annotated_tweets  61.0%
+      seth           vs krisna annotated_tweets  62.0%
+      seth           vs Nacc_annotated_tweets  51.0%
+      seth           vs Nita_annotated_tweets  62.0%
+      seth           vs Reaksa_annotation  50.0%
+      seth           vs Sambath_annotated_tweets  61.0%
       krisna annotated_tweets vs Nacc_annotated_tweets  63.0%
       krisna annotated_tweets vs Nita_annotated_tweets  87.0%
       krisna annotated_tweets vs Reaksa_annotation  52.0%
@@ -100,34 +100,34 @@ Sambath_annotated_tweets             0.483                    1.000             
     10 most contested tweets:
       id=36  [3/6 agree]
         with i mean this is just insane . . . rhandlerr rhandlerr rhandlerr pic.twitter.com/30llzt6egr
-        annotated_tweets=Irrelevant, krisna annotated_tweets=Negative, Nacc_annotated_tweets=Irrelevant, Nita_annotated_tweets=Negative, Reaksa_annotation=Neutral, Sambath_annotated_tweets=Negative
+        seth=Irrelevant, krisna annotated_tweets=Negative, Nacc_annotated_tweets=Irrelevant, Nita_annotated_tweets=Negative, Reaksa_annotation=Neutral, Sambath_annotated_tweets=Negative
       id=39  [3/6 agree]
         hey @ verizonfios @ verizonsupport why does my internet speed drop to 591 mbit / s when i pay fo
-        annotated_tweets=Neutral, krisna annotated_tweets=Irrelevant, Nacc_annotated_tweets=Negative, Nita_annotated_tweets=Irrelevant, Reaksa_annotation=Neutral, Sambath_annotated_tweets=Irrelevant
+        seth=Neutral, krisna annotated_tweets=Irrelevant, Nacc_annotated_tweets=Negative, Nita_annotated_tweets=Irrelevant, Reaksa_annotation=Neutral, Sambath_annotated_tweets=Irrelevant
       id=43  [3/6 agree]
         csgo pls stop ranking me up games are getting harder huhu
-        annotated_tweets=Positive, krisna annotated_tweets=Neutral, Nacc_annotated_tweets=Positive, Nita_annotated_tweets=Neutral, Reaksa_annotation=Negative, Sambath_annotated_tweets=Neutral
+        seth=Positive, krisna annotated_tweets=Neutral, Nacc_annotated_tweets=Positive, Nita_annotated_tweets=Neutral, Reaksa_annotation=Negative, Sambath_annotated_tweets=Neutral
       id=44  [3/6 agree]
         google and amazon were the biggest imitators of the brands used in phishing attacks in the june 
-        annotated_tweets=Negative, krisna annotated_tweets=Irrelevant, Nacc_annotated_tweets=Neutral, Nita_annotated_tweets=Irrelevant, Reaksa_annotation=Positive, Sambath_annotated_tweets=Irrelevant
+        seth=Negative, krisna annotated_tweets=Irrelevant, Nacc_annotated_tweets=Neutral, Nita_annotated_tweets=Irrelevant, Reaksa_annotation=Positive, Sambath_annotated_tweets=Irrelevant
       id=51  [3/6 agree]
         not exactly. free means the price is your data. during the early days of avast and avg, i used t
-        annotated_tweets=Neutral, krisna annotated_tweets=Negative, Nacc_annotated_tweets=Irrelevant, Nita_annotated_tweets=Negative, Reaksa_annotation=Neutral, Sambath_annotated_tweets=Negative
+        seth=Neutral, krisna annotated_tweets=Negative, Nacc_annotated_tweets=Irrelevant, Nita_annotated_tweets=Negative, Reaksa_annotation=Neutral, Sambath_annotated_tweets=Negative
       id=53  [3/6 agree]
         @ yoyaltygaming i can't see them.
-        annotated_tweets=Irrelevant, krisna annotated_tweets=Negative, Nacc_annotated_tweets=Irrelevant, Nita_annotated_tweets=Negative, Reaksa_annotation=Irrelevant, Sambath_annotated_tweets=Negative
+        seth=Irrelevant, krisna annotated_tweets=Negative, Nacc_annotated_tweets=Irrelevant, Nita_annotated_tweets=Negative, Reaksa_annotation=Irrelevant, Sambath_annotated_tweets=Negative
       id=55  [3/6 agree]
         than $500 on the aero va oled - award winning design, stunning 4k oled panel, color in front edg
-        annotated_tweets=Irrelevant, krisna annotated_tweets=Positive, Nacc_annotated_tweets=Neutral, Nita_annotated_tweets=Positive, Reaksa_annotation=Neutral, Sambath_annotated_tweets=Positive
+        seth=Irrelevant, krisna annotated_tweets=Positive, Nacc_annotated_tweets=Neutral, Nita_annotated_tweets=Positive, Reaksa_annotation=Neutral, Sambath_annotated_tweets=Positive
       id=65  [3/6 agree]
         @saquon you peep with ball carrier vision? they hurt 🤦. ‍.
-        annotated_tweets=Negative, krisna annotated_tweets=Neutral, Nacc_annotated_tweets=Irrelevant, Nita_annotated_tweets=Negative, Reaksa_annotation=Neutral, Sambath_annotated_tweets=Neutral
+        seth=Negative, krisna annotated_tweets=Neutral, Nacc_annotated_tweets=Irrelevant, Nita_annotated_tweets=Negative, Reaksa_annotation=Neutral, Sambath_annotated_tweets=Neutral
       id=77  [3/6 agree]
         it is not the first time that the eu commission has taken such a step.
-        annotated_tweets=Positive, krisna annotated_tweets=Neutral, Nacc_annotated_tweets=Positive, Nita_annotated_tweets=Irrelevant, Reaksa_annotation=Neutral, Sambath_annotated_tweets=Neutral
+        seth=Positive, krisna annotated_tweets=Neutral, Nacc_annotated_tweets=Positive, Nita_annotated_tweets=Irrelevant, Reaksa_annotation=Neutral, Sambath_annotated_tweets=Neutral
       id=79  [3/6 agree]
         "and so it this a symptom of something bigger rolling on? so is it a cause? so now's where every
-        annotated_tweets=Neutral, krisna annotated_tweets=Irrelevant, Nacc_annotated_tweets=Irrelevant, Nita_annotated_tweets=Neutral, Reaksa_annotation=Negative, Sambath_annotated_tweets=Irrelevant
+        seth=Neutral, krisna annotated_tweets=Irrelevant, Nacc_annotated_tweets=Irrelevant, Nita_annotated_tweets=Neutral, Reaksa_annotation=Negative, Sambath_annotated_tweets=Irrelevant
 
 
 [7] READING THESE NUMBERS
