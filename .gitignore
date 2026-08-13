@@ -12,3 +12,6 @@ nltk_data/
 
 .DS_Store
 *.swp
+
+# LibreOffice lock files (created while a CSV is open)
+.~lock.*#
