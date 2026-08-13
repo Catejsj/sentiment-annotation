@@ -1,0 +1,135 @@
+==============================================================================
+TEXT REPRESENTATION - CountVectorizer (Bag of Words)
+source: /home/sherlock/Desktop/sentiment_annotation/data/processed/tweets_preprocessed.csv   (100 documents)
+==============================================================================
+
+[1] WHAT THIS DOES
+
+    A model cannot read text, only numbers. CountVectorizer builds a table:
+
+        one ROW per document (tweet)
+        one COLUMN per distinct term in the whole corpus
+        each CELL = how many times that term appears in that document
+
+    That table is the "document-term matrix", and the representation is called
+    Bag of Words because it records WHICH words occur and HOW OFTEN, but throws
+    away the order they came in.
+
+    N-grams are how word order is partly recovered. An n-gram is a run of n
+    consecutive words, so the vectoriser can treat "not good" as its own column
+    instead of separate "not" and "good" columns that lose the connection.
+
+[2] WORKED EXAMPLE  (3 tiny documents, unigrams)
+                   bad  game  good  not
+doc1: 'good game'    0     1     1    0
+doc2: 'bad game'     1     1     0    0
+doc3: 'not good'     0     0     1    1
+
+    doc3 scores 1 for 'good' and 1 for 'not', but nothing links them -
+    to a unigram model doc1 and doc3 both simply 'contain good'.
+    That is exactly the weakness bigrams fix:
+      bad game  good game  not good
+doc1         0          1         0
+doc2         1          0         0
+doc3         0          0         1
+
+    'not good' is now its own feature, and doc3 is distinguishable.
+
+
+[3] THE FOUR REPRESENTATIONS  (min_df=1)
+    setting      ngram_range    features         matrix  sparsity   meaning
+    unigram      (1, 1)              698        100x698    98.5%   single words: 'good', 'game'
+    bigram       (2, 2)              988        100x988    99.0%   word pairs: 'not good', 'red dead'
+    trigram      (3, 3)              913        100x913    99.0%   word triples: 'red dead redemption'
+    uni+bigram   (1, 2)             1686       100x1686    98.8%   both, the usual choice for sentiment
+
+    'sparsity' = share of cells that are zero. Most tweets contain almost
+    none of the corpus vocabulary, so the matrix is mostly empty - which is
+    why scikit-learn stores it in a sparse format rather than a full table.
+    Notice the feature count explodes as n grows while each feature gets
+    rarer: that is why unigrams+bigrams is the usual compromise.
+
+
+[4:unigram] TOP 20 UNIGRAM FEATURES BY TOTAL COUNT
+    game                               16   play                               14   
+    new                                12   not                                11   
+    but                                10   go                                 10   
+    get                                 9   see                                 9   
+    like                                8   microsoft                           8   
+    really                              8   come                                7   
+    cannot                              6   dead                                6   
+    first                               6   guy                                 6   
+    no                                  6   thanks                              6   
+    time                                6   always                              5   
+
+
+[4:bigram] TOP 20 BIGRAM FEATURES BY TOTAL COUNT
+    red dead                            4   cannot wait                         3   
+    dead redemption                     3   doom doom                           3   
+    favorite game                       3   first time                          3   
+    hope see                            3   look like                           3   
+    call duty                           2   come hang                           2   
+    fix server                          2   league legends                      2   
+    no longer                           2   not watch                           2   
+    oh fuck                             2   play overwatch                      2   
+    pls fix                             2   rhandlerr rhandlerr                 2   
+    rocket league                       2   156gb absolutely                    1   
+
+
+[4:trigram] TOP 20 TRIGRAM FEATURES BY TOTAL COUNT
+    red dead redemption                 3   doom doom doom                      2   
+    pls fix server                      2   156gb absolutely pathetic           1   
+    1gig sim card                       1   2am maybe later                     1   
+    3rd person always                   1   40gb cable 199d                     1   
+    4k oled panel                       1   8gb single sim                      1   
+    abandon move dead                   1   aboard represent big                1   
+    absolutely adore heart              1   absolutely get new                  1   
+    accelerator card low                1   account really tire                 1   
+    acquire past three                  1   act like nothing                    1   
+    add fortnite very                   1   add really fun                      1   
+
+
+[4:uni+bigram] TOP 20 UNI+BIGRAM FEATURES BY TOTAL COUNT
+    game                               16   play                               14   
+    new                                12   not                                11   
+    but                                10   go                                 10   
+    get                                 9   see                                 9   
+    like                                8   microsoft                           8   
+    really                              8   come                                7   
+    cannot                              6   dead                                6   
+    first                               6   guy                                 6   
+    no                                  6   thanks                              6   
+    time                                6   always                              5   
+
+
+[5] MOST DISTINCTIVE TERMS PER SENTIMENT CLASS  (unigrams)
+    Counted within each class, so these are the words that characterise it.
+
+    Positive (42 documents)
+      game(10), play(8), see(8), new(7), come(6), cannot(5), go(5), not(5), thanks(5), time(5), but(4), doom(4)
+
+    Negative (38 documents)
+      but(6), game(6), microsoft(6), play(6), really(6), like(5), get(4), go(4), new(4), no(4), not(4), dead(3)
+
+    Neutral (14 documents)
+      use(3), well(3), co(2), gold(2), krieg(2), microsoft(2), nothing(2), something(2), think(2), unk(2), 199d(1), 1gig(1)
+
+    Irrelevant (16 documents)
+      rhandlerr(3), ban(2), best(2), core(2), krieg(2), mean(2), oled(2), player(2), watch(2), 4k(1), absolutely(1), accelerator(1)
+
+
+[6] ONE DOCUMENT AS A VECTOR
+    document #51  label=Positive
+    cleaned text : new game race mode call liferun add fortnite very effective soon first ever showcased pax south extra day game mode play red green cross society worke
+    vector length: 698 (one slot per corpus term)
+    non-zero     : 31  ->  34 total words
+    the non-zero slots: add=1, always=1, call=1, character=1, cross=1, day=1, different=1, effective=1, ever=1, excite=1, extra=1, first=1, fortnite=1, game=2, green=1, liferun=1, live=1, mission=1
+    every other slot in that row is 0.
+
+
+[7] FILES WRITTEN
+    /home/sherlock/Desktop/sentiment_annotation/data/processed/count_matrix_uni_bigram.csv
+        the document-term matrix for 'uni+bigram': 100 rows x 1686 term columns,
+        plus id and label columns so it can be fed straight to a classifier
+    /home/sherlock/Desktop/sentiment_annotation/data/processed/vocabulary_uni_bigram.csv
+        every term with its total count and how many documents contain it
